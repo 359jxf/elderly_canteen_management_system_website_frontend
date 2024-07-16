@@ -1,30 +1,31 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
-  <router-view />
+  <div id="app">
+    <nav v-if="showNavBar">
+      <router-link to="/">Login</router-link>
+      <router-link to="/OTP">OTPLogin</router-link>
+      <router-link to="/home">Home</router-link>
+      <router-link to="/register">Register</router-link>
+      <router-link to="/newpsd">Newpsd</router-link>
+    </nav>
+    <router-view />
+  </div>
 </template>
 
+<script>
+export default {
+  name: "App",
+  props: {
+    showNavBar: {
+      type: Boolean,
+      default: false,
+    },
+  },
+};
+</script>
+
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-
 nav {
-  padding: 30px;
-}
-
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-nav a.router-link-exact-active {
-  color: #42b983;
+  display: flex;
+  gap: 10px;
 }
 </style>
