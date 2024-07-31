@@ -51,18 +51,18 @@ export default {
       }
       try {
         const res = await axios.post(
-          "https://localhost:7289/api/accounts/login",
+          "http://127.0.0.1:4523/m1/4808550-4462943-default/api/account/login?apifoxResponseId=490068059",
           {
-            phone: this.phonenumber,
-            password: this.password,
+            PHONE_NUM: this.phonenumber,
+            PASSWORD: this.password,
           }
         );
 
-        if (res.data.success) {
+        if (res.data.loginSuccess) {
           console.log("Login successful");
           console.log("Token:", res.data.response.token);
-          console.log("Role:", res.data.response.role);
-          console.log("Username:", res.data.response.username);
+          console.log("Role:", res.data.response.IDENTITY);
+          console.log("Username:", res.data.response.ACCOUNT_NAME);
 
           // 将 Token 存储在 localStorage
           localStorage.setItem("token", res.data.response.token);
