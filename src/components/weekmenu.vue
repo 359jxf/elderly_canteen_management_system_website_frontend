@@ -40,14 +40,8 @@
     name: 'weekmenu',
     data() {  
       return {  
-        //加了“day”的是字符串，记录日期YYYY-MM-DD
-        monday: '',
-        tuesday: '',
-        wednesday: '',
-        thursday: '',
-        friday: '',
-        saturday: '',
-        sunday: '',
+        //weekdays[0]~weekdays[6]分别记录周一到周日的日期，格式为YYYY-MM-DD的string
+        weekdays: [],
         //没加“day”的是数组，接收菜品
         mon: [],
         tue: [],
@@ -67,26 +61,48 @@
         const now = new Date();
         const day = now.getDay();
         const year = now.getFullYear();  
-        const month = String(now.getMonth() + 1).padStart(2, '0'); // 月份从0开始，所以需要加1
-        this.monday = `${year}-${month}-${String(now.getDate() - day + 1).padStart(2, '0')}`;
-        this.tuesday = `${year}-${month}-${String(now.getDate() - day + 2).padStart(2, '0')}`;
-        this.wednesday = `${year}-${month}-${String(now.getDate() - day + 3).padStart(2, '0')}`;
-        this.thursday = `${year}-${month}-${String(now.getDate() - day + 4).padStart(2, '0')}`;
-        this.friday = `${year}-${month}-${String(now.getDate() - day + 5).padStart(2, '0')}`;
-        this.saturday = `${year}-${month}-${String(now.getDate() - day + 6).padStart(2, '0')}`;
-        this.sunday = `${year}-${month}-${String(now.getDate() - day + 7).padStart(2, '0')}`;
+        const month = now.getMonth() + 1; // 月份从0开始，所以需要加1
+        const date = now.getDate();
+
+        let monthDay = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]; // 存每个月最大日期
+        if ((year % 4 == 0 && year % 100 != 0) || year % 400 ==0) { // 判断是否闰年
+          monthDay[1]++;
+        }
+
+        for (let i=0; i<7; i++) { // 形成本周每天的日期，放到weekdays中（同时处理日期边界问题）
+          let targetDate = date - day + i + 1;
+          let targetMonth = month;
+          let targetYear = year;
+          if (targetDate <= 0) {
+            targetMonth--;
+            if (targetMonth < 1) {
+              targetMonth = 12;
+              targetYear--;
+            }
+            targetDate += monthDay[targetMonth - 1];
+          }
+          else if (targetDate > monthDay[targetMonth - 1]) {
+            targetDate -= monthDay[targetMonth - 1];
+            targetMonth++;
+            if (targetMonth > 12) {
+              targetMonth = 1;
+              targetYear++;
+            }
+          }
+          this.weekdays[i] = `${targetYear}-${String(targetMonth).padStart(2, '0')}-${String(targetDate).padStart(2, '0')}`
+        }
       },
       async fetchMenus() {
         try {  
-          const response = await axios.get('http://127.0.0.1:4523/m1/4808550-4462943-default/getWeekmenu');
+          const response = await axios.get('http://127.0.0.1:4523/m1/4808550-4462943-default/getWeekmenuAndWeekDiscount');
           const menuItems = response.data.response;
-          this.mon = menuItems.filter(item => item.WEEK === this.monday);
-          this.tue = menuItems.filter(item => item.WEEK === this.tuesday);
-          this.wed = menuItems.filter(item => item.WEEK === this.wednesday);
-          this.thu = menuItems.filter(item => item.WEEK === this.thursday);
-          this.fri = menuItems.filter(item => item.WEEK === this.friday);
-          this.sat = menuItems.filter(item => item.WEEK === this.saturday);
-          this.sun = menuItems.filter(item => item.WEEK === this.sunday);
+          this.mon = menuItems.filter(item => item.WEEK === this.weekdays[0]);
+          this.tue = menuItems.filter(item => item.WEEK === this.weekdays[1]);
+          this.wed = menuItems.filter(item => item.WEEK === this.weekdays[2]);
+          this.thu = menuItems.filter(item => item.WEEK === this.weekdays[3]);
+          this.fri = menuItems.filter(item => item.WEEK === this.weekdays[4]);
+          this.sat = menuItems.filter(item => item.WEEK === this.weekdays[5]);
+          this.sun = menuItems.filter(item => item.WEEK === this.weekdays[6]);
         } catch (error) {  
           console.error('Failed to fetch menus:', error);
         }  
