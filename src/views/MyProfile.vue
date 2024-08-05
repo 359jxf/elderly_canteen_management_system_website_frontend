@@ -1,113 +1,129 @@
 <template>
-    <div class="container">
-      <div class="info-wrapper">
-        <div class="login-wrapper">
-          <div class="header">个人信息</div>
-          <div class="form-wrapper">
-            <div class="input-group">
-                <p><span class="required">*</span>昵称</p>
-                <div v-if="!isEditing">{{ username }}</div>
-                <input
-                v-else
-                type="text"
-                v-model="username"
-                class="input-item"
-                />
-            </div>
-            <div class="input-group">
-              <p><span class="required">*</span>密码</p>
-              <div v-if="!isEditing">******</div>
-              <div v-else>
+  <div class="container">
+    <div class="board"></div>
+    <div class="info-wrapper">
+      <div class="login-wrapper">
+        <div class="header">个人信息</div>
+        <div class="form-wrapper">
+          <div class="input-group">
+            <p>昵称</p>
+            <div v-if="!isEditing">{{ username }}</div>
+            <input v-else type="text" v-model="username" class="input-item" />
+          </div>
+          <div class="input-group">
+            <p>密码</p>
+            <div v-if="!isEditing">******</div>
+            <div v-else>
               ****** <button class="action-btn" @click="showChangePasswordModal">修改密码</button>
-              </div>
             </div>
-            <div class="input-group">
-              <p><span class="required">*</span>手机号</p>
-              <div v-if="!isEditing">{{ phone }}</div>
-              <div v-else>
-                {{ phone }} <button class="action-btn" @click="showChangePhoneModal">手机改绑</button>
-              </div>
+            <change-password-modal
+              v-if="isChangePasswordModalVisible"
+              @close="isChangePasswordModalVisible = false"
+              :phone="phone"
+              :old-password="password" />
+          </div>
+          <div class="input-group">
+            <p>手机号</p>
+            <div v-if="!isEditing">{{ phone }}</div>
+            <div v-else>
+              {{ phone }} <button class="action-btn" @click="showChangePhoneModal">手机改绑</button>
             </div>
-            <div class="input-group">
-              <p><span class="required">*</span>性别</p>
-              <div v-if="!isEditing">{{ gender }}</div>
-              <select v-else v-model="gender"  class="input-item">
-                <option value="">选择性别</option>
-                <option value="male">男</option>
-                <option value="female">女</option>
-              </select>
-            </div>
-            <div class="input-group">
-              <p>出生日期</p>
-              <div v-if="!isEditing">{{ birthdate }}</div>
-              <input
-                v-else
-                type="date"
-                v-model="birthdate"
-                :disabled="!isEditing"
-                class="input-item"
-              />
-            </div>
-            <div class="input-group">
-              <p>头像</p>
-              
-              <input v-if="isEditing" type="file" @change="handleAvatarUpload" :disabled="!isEditing" />
-            </div>
-            <div class="avatar-preview">
-              <img :src="avatarPreview || defaultAvatar" alt="头像预览" />
-            </div>
-            <div class="btn" @click="isEditing ? updateProfile() : isEditing = true">
-              {{ isEditing ? '确认修改' : '编辑个人信息' }}
-            </div>
+          </div>
+          <div class="input-group">
+            <p>性别</p>
+            <div v-if="!isEditing">{{ gender }}</div>
+            <select v-else v-model="gender" class="input-item">
+              <option value="">选择性别</option>
+              <option value="male">男</option>
+              <option value="female">女</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <p>出生日期</p>
+            <div v-if="!isEditing">{{ birthdate }}</div>
+            <input v-else type="date" v-model="birthdate" :disabled="!isEditing" class="input-item" />
+          </div>
+          <div class="input-group">
+            <p>头像</p>
+            <input v-if="isEditing" type="file" @change="handleAvatarUpload" :disabled="!isEditing" />
+          </div>
+          <div class="avatar-preview">
+            <img :src="avatarPreview || defaultAvatar" alt="头像预览" />
+          </div>
+          <div class="btn" @click="isEditing ? updateProfile() : isEditing = true">
+            {{ isEditing ? '确认修改' : '编辑个人信息' }}
           </div>
         </div>
       </div>
-      <transition name="fade">
-        <div v-if="errorMessage" class="error-popup">{{ errorMessage }}</div>
-      </transition>
-      <!-- 确保添加以下两个组件 -->
-      <change-password-modal v-if="isChangePasswordModalVisible" @close="isChangePasswordModalVisible = false" />
-      <change-phone-modal v-if="isChangePhoneModalVisible" @close="isChangePhoneModalVisible = false" />
+    </div>
+    <change-password-modal v-if="isChangePasswordModalVisible" @close="isChangePasswordModalVisible = false" />
+    <change-phone-modal v-if="isChangePhoneModalVisible" @close="isChangePhoneModalVisible = false" />
   </div>
-  </template>
+</template>
+
+
   
   <script>
   import axios from "axios";
   import ChangePasswordModal from '../components/ChangePasswordModal.vue';
   import ChangePhoneModal from '../components/ChangePhoneModal.vue';
-  
+
   export default {
     components: {
-        ChangePasswordModal,
-        ChangePhoneModal,
-   },
+      ChangePasswordModal,
+      ChangePhoneModal,
+    },
     data() {
       return {
-        isEditing: false,
-        username: "",
-        password: "",
-        phone: "",
-        gender: "",
-        birthdate: "",
-        avatar: null,
-        avatarPreview: null,
-        defaultAvatar: new URL('../assets/defaultportrait.png', import.meta.url).href,
-        errorMessage: "",
-        isChangePasswordModalVisible: false,
-        isChangePhoneModalVisible: false,
+        isEditing: false, // 控制是否处于编辑状态
+        username: "", // 用户名
+        password: "", // 密码
+        phone: "", // 手机号
+        gender: "", // 性别
+        birthdate: "", // 出生日期
+        avatar: null, // 上传的头像文件
+        avatarPreview: null, // 头像预览URL
+        defaultAvatar: new URL('../assets/defaultportrait.png', import.meta.url).href, // 默认头像
+        isChangePasswordModalVisible: false, // 控制修改密码弹窗显示状态
+        isChangePhoneModalVisible: false, // 控制修改手机号弹窗显示状态
       };
     },
     created() {
-      const user = JSON.parse(localStorage.getItem('user'));
-      if (user) {
-        this.username = user.name;
-        this.phone = user.phone || '';
-        this.gender = user.gender || '';
-        this.birthdate = user.birthdate || '';
-        this.avatarPreview = user.avatar || this.defaultAvatar;
-      }
+      this.fetchUserData(); // 组件创建时获取用户数据
     },
     methods: {
+      // 获取用户数据
+      fetchUserData() {
+        const token = localStorage.getItem('token'); // 获取存储的 token
+
+        const config = {
+          method: "get",
+          url: "http://127.0.0.1:4523/m1/4808550-0-default/api/account/getPersonInfo",
+          headers: {
+            "Authorization": `Bearer ${token}` // 在请求头中包含 token
+          }
+        };
+
+        axios(config)
+          .then(response => {
+            if (response.data.getSuccess) {
+              const user = response.data.response;
+              // 设置用户数据
+              this.username = user.accountName;
+              this.phone = user.phoneNum;
+              this.gender = user.gender;
+              this.birthdate = user.birthDate;
+              this.avatarPreview = user.portrait || this.defaultAvatar;
+            } else {
+              alert(response.data.msg); // 显示错误信息
+            }
+          })
+          .catch(error => {
+            console.error("Error fetching user data:", error);
+            alert("获取用户数据失败，请稍后再试");
+          });
+      },
+      // 处理头像上传
       handleAvatarUpload(event) {
         const file = event.target.files[0];
         if (file) {
@@ -115,79 +131,71 @@
           this.avatarPreview = URL.createObjectURL(file); // 生成预览 URL
         }
       },
+      // 更新用户信息
       updateProfile() {
-        if (!this.username || !this.phone || !this.gender) {
-          this.showError("请填写所有必填项");
-          return;
-        }
-  
+        const token = localStorage.getItem('token'); // 获取存储的 token
+
         // 构建请求数据
         const data = {
-          username: this.username,
-          password: this.password,
-          phone: this.phone,
+          accountName: this.username,
+          phoneNum: this.phone,
           gender: this.gender,
-          birthdate: this.birthdate,
-          avatar: this.avatar ? this.avatar : this.avatarPreview, // 如果没有上传新头像，则使用当前头像
+          birthDate: this.birthdate,
+          portrait: this.avatar ? this.avatar : this.avatarPreview, // 如果没有上传新头像，则使用当前头像
+          address: "", // 你可以在这里添加或处理地址字段
+          name: "" // 你可以在这里添加或处理其他字段
         };
-  
+
         const formData = new FormData();
         for (const key in data) {
           formData.append(key, data[key]);
         }
-  
+
         const config = {
           method: "post",
-          url: "https://apifoxmock.com/m1/4808550-4462943-default/api/updateProfile",
+          url: "http://127.0.0.1:4523/m1/4808550-0-default/api/Account/alterPersonInfo",
           headers: {
-            "Content-Type": "multipart/form-data",
+            "Authorization": `Bearer ${token}` // 在请求头中包含 token
           },
           data: formData,
         };
-  
+
         axios(config)
           .then((response) => {
-            if (response.data.status === "success") {
+            if (response.data.alterSuccess) {
+              alert("个人信息修改成功！"); // 修改成功提示
               // 更新 localStorage 中的用户信息
               const updatedUser = {
-                name: this.username,
-                avatar: this.avatar ? URL.createObjectURL(this.avatar) : this.avatarPreview,
-                phone: this.phone,
+                accountName: this.username,
+                portrait: this.avatar ? URL.createObjectURL(this.avatar) : this.avatarPreview,
+                phoneNum: this.phone,
                 gender: this.gender,
-                birthdate: this.birthdate
+                birthDate: this.birthdate
               };
               localStorage.setItem("user", JSON.stringify(updatedUser));
-              this.showSuccess("个人信息修改成功！");
-              this.isEditing = false;
+              this.isEditing = false; // 退出编辑状态
             } else {
-              this.showError(response.data.message);
+              alert("修改失败，请稍后重试！"); // 修改失败提示
             }
           })
           .catch((error) => {
             console.log(error);
-            this.showError("个人信息修改失败，请稍后再试");
+            alert("个人信息修改失败，请稍后再试");
           });
       },
+      // 显示修改密码弹窗
       showChangePasswordModal() {
-      this.isChangePasswordModalVisible = true;
+        this.isChangePasswordModalVisible = true;
       },
+      // 显示修改手机号弹窗
       showChangePhoneModal() {
-      this.isChangePhoneModalVisible = true;
-      },
-      showError(message) {
-        this.errorMessage = message;
-        setTimeout(() => {
-          this.errorMessage = "";
-        }, 3000); // 错误信息3秒后消失
-      },
-      showSuccess(message) {
-        this.errorMessage = message;
-        setTimeout(() => {
-          this.errorMessage = "";
-        }, 2000); // 成功信息2秒后消失
+        this.isChangePhoneModalVisible = true;
       },
     },
   };
+
+
+
   </script>
   
   <style scoped>
@@ -203,7 +211,18 @@
     background-position: center;
     overflow: hidden;
   }
-  
+  .board {
+  background-image: url('@/assets/board.png'); /* 新的背景图片 */
+  background-size:28%;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: absolute;
+  top: -8%;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1; /* 确保在 info-wrapper 之下 */
+}
   .container::before {
     content: "";
     position: absolute;
@@ -258,8 +277,7 @@
     text-align: center;
     margin-bottom: 10px;
     line-height: 40px;
-    color: #dd8e0e;
-    font-family: 'Roboto', sans-serif; /* 使用自定义字体 */
+    color: #cb820d;
     text-shadow: 2px 2px 4px rgba(251, 251, 103, 0.5); /* 添加文字阴影 */
   }
   
@@ -279,12 +297,6 @@
     
   }
   
-  .input-group p {
-    margin: 0;
-    width: 80px;
-    /* 设定固定宽度，根据需要调整 */
-  }
-  
   .input-item {
     flex: 1;
     padding: 10px;
@@ -292,10 +304,12 @@
     border: 1px solid #ccc;
     font-size: 10px;
   }
-  
-  .required {
-    color: red;
-    margin-right: 5px;
+  .input-group p {
+    margin: 0;
+    width: 80px;
+    font-weight: bold; /* 加粗字体 */
+    color: #d38f35; /* 修改颜色 */
+    font-size: large;
   }
   
   button {
@@ -309,6 +323,8 @@
     text-align: center;
     background-color: #de6700;
     color: white;
+    font-weight: bold;
+    font-size: 120%;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s;
@@ -319,9 +335,11 @@
   }
   
   .action-btn {
-    padding: 5px 10px;
+    padding: 7px 20px;
     background-color: orange;
     color: white;
+    font-size: 100%;
+    font-weight: bold;
     border: none;
     border-radius: 5px;
     cursor: pointer;
