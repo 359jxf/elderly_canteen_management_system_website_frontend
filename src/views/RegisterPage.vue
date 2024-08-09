@@ -103,7 +103,6 @@
 
 <script>
 import axios from "axios";
-import qs from "qs";
 
 export default {
   data() {
@@ -129,8 +128,13 @@ export default {
     handleAvatarUpload(event) {
       const file = event.target.files[0];
       if (file) {
-        this.avatar = file;
-        this.avatarPreview = URL.createObjectURL(file); // 生成预览 URL
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          this.avatar = reader.result; // 将 Base64 字符串赋值给 this.avatar
+          this.avatarPreview = reader.result; // 预览 URL 也可以使用 Base64 字符串
+          console.log(this.avatarPreview);
+        };
+        reader.readAsDataURL(file); // 读取文件并转换为 Base64
       }
     },
     register() {
@@ -139,7 +143,7 @@ export default {
         !this.password ||
         !this.confirmPassword ||
         !this.phone ||
-        !this.verificationCode ||
+        // !this.verificationCode ||
         !this.gender
       ) {
         this.showError("请填写所有必填项");
@@ -151,33 +155,46 @@ export default {
         return;
       }
 
+      if (!this.avatar) {
+        const img = new Image();
+        img.src = this.defaultAvatar;
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0);
+          this.defaultAvatar = canvas.toDataURL("image/png");
+          console.log(this.defaultAvatar);
+        };
+      }
+
       // 构建请求数据
       const data = {
-        username: this.username,
+        userName: this.username,
         password: this.password,
         phone: this.phone,
-        verificationCode: this.verificationCode,
-        gender: this.gender,
-        birthdate: this.birthdate || "", // 如果生日为空，则传递空字符串
+        verificationCode: this.verificationCode ? this.verificationCode : "",
         avatar: this.avatar ? this.avatar : this.defaultAvatar, // 如果没有上传头像，则传递默认头像
+        gender: this.gender,
+        birthDate: this.birthdate || "", // 如果生日为空，则传递空字符串
       };
-
-      const formData = qs.stringify(data);
 
       const config = {
         method: "post",
-        url: "https://apifoxmock.com/m1/4808550-4462943-default/api/register",
+        url: "http://8.136.125.61/api/account/register",
         headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
+          "Content-Type": "application/json",
         },
-        data: formData,
+        data: JSON.stringify(data), // 使用 JSON.stringify 序列化数据对象
       };
 
       axios(config)
         .then((response) => {
-          if (response.data.status === "success") {
+          if (response.data.msg === "注册成功") {
             // 将 Token 存储在 localStorage
             localStorage.setItem("token", response.data.token);
+            console.log(response.data.response);
             this.showSuccess("注册成功！");
           } else {
             this.showError(response.data.message);

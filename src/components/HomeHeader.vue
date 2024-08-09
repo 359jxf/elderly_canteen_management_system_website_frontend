@@ -1,0 +1,123 @@
+<!-- components/Header.vue -->
+<template>
+  <div class="header">
+    <div class="header-left">
+      <span class="canteen-name">老人食堂</span>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="#searchNav">搜索</a></li>
+        <li><a href="#menuNav">菜单</a></li>
+        <li><a href="#reviewsNav">评价</a></li>
+        <li><a href="#donateNav">捐赠</a></li>
+      </ul>
+    </nav>
+    <div class="header-right">
+      <template v-if="loggedIn">
+        <img
+          :src="user.avatar"
+          alt="Avatar"
+          class="avatar"
+          @click="goToProfile"
+        />
+        <span class="username">{{ user.name }}，你好！</span>
+      </template>
+      <template v-else>
+        <button @click="goToLogin" class="login-button">登录</button>
+      </template>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  props: {
+    loggedIn: Boolean,
+    user: Object,
+  },
+  methods: {
+    goToLogin() {
+      this.$router.push("/login");
+    },
+    goToProfile() {
+      this.$router.push("/profile");
+    },
+  },
+};
+</script>
+
+<style scoped>
+/* Header 相关样式 */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: rgba(255, 184, 73);
+  padding: 10px 20px;
+  margin-bottom: -1px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.header-left {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.canteen-name {
+  color: #ffffff;
+}
+
+nav ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+nav ul li {
+  display: inline;
+  margin-left: 5vh;
+  margin-right: 5vh;
+}
+
+nav ul li a {
+  color: white;
+  text-decoration: none;
+}
+
+nav ul li a:hover {
+  text-decoration: underline;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.username {
+  margin-left: 10px;
+  font-size: 18px;
+  color: #ffffff;
+}
+
+.login-button {
+  text-align: center;
+  padding: 10px 30px;
+  color: #fff;
+  cursor: pointer;
+  background-color: #42b983;
+  border-radius: 10px;
+  border: none;
+  transition: background-color 0.3s;
+}
+
+.login-button:hover {
+  background-color: #369d6e;
+}
+</style>

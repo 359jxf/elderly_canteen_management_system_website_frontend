@@ -9,7 +9,7 @@ import MyProfile from "../views/MyProfile.vue";
 const routes = [
   {
     path: "/",
-    redirect: "/login",
+    redirect: "/home",
   },
   {
     path: "/login",

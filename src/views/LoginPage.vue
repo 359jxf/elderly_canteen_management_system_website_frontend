@@ -50,28 +50,27 @@ export default {
         return;
       }
       try {
-        const res = await axios.post(
-          "http://127.0.0.1:4523/m1/4808550-4462943-default/api/account/login?apifoxResponseId=490068059",
-          {
-            PHONE_NUM: this.phonenumber,
-            PASSWORD: this.password,
-          }
-        );
-
+        const res = await axios.post("http://8.136.125.61/api/account/login", {
+          phoneNum: this.phonenumber,
+          password: this.password,
+        });
+        console.log(res.data.response);
         if (res.data.loginSuccess) {
           console.log("Login successful");
           console.log("Token:", res.data.response.token);
-          console.log("Role:", res.data.response.IDENTITY);
-          console.log("Username:", res.data.response.ACCOUNT_NAME);
+          console.log("Role:", res.data.response.identity);
+          console.log("Username:", res.data.response.accountName);
 
           // 将 Token 存储在 localStorage
           localStorage.setItem("token", res.data.response.token);
           // 跳转到 /home 页面
           this.$router.push("/home");
         } else {
+          console.log("Login not successful");
           alert(res.data.msg);
         }
       } catch (error) {
+        console.log("Login error");
         if (error.response) {
           // 请求已发出，但服务器响应的状态码不在 2xx 范围内
           if (error.response.status === 404) {
@@ -83,7 +82,7 @@ export default {
           }
         } else {
           // 一些其他的错误
-          alert("登录失败");
+          alert("登录失败nothing");
         }
       }
     },

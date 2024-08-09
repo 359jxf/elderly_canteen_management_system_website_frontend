@@ -9,7 +9,7 @@
         <div class="input-group">
           <p>原密码：</p>
           <input type="password" v-model="oldPassword" />
-          <a @click="forgotPassword">忘记密码</a>
+          <a @click="forgotPassword">忘记密码?</a>
         </div>
         <div class="input-group">
           <p>新密码：</p>
@@ -115,27 +115,33 @@ export default {
 
 .modal-content {
   background-color: #fff;
-  padding: 20px;
-  border-radius: 5px;
-  width: 400px;
+  padding: 0 0px 10px 0px; /* 上边距为0，其余边距为10px */
+  border-radius: 10px;
+  width: 500px;
+  height: 25%;
   position: relative;
 }
 
 .modal-header {
+  background-color: #d68c37;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-radius: 10px 10px 0 0;
 }
 
 .header {
-  font-size: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 120%;
   font-weight: bold;
-  text-align: center;
-  margin-bottom: 10px;
-  line-height: 40px;
-  color: #d68c37;
-  font-family: "Roboto", sans-serif; /* 使用自定义字体 */
-  text-shadow: 2px 2px 4px rgba(251, 251, 103, 0.5); /* 添加文字阴影 */
+  color: white;
+  padding: 15px 20px;
+  margin-bottom: -1px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
 .close {
@@ -148,12 +154,15 @@ export default {
 .input-group {
   display: flex;
   align-items: center;
-  margin: 10px 0;
+  margin: 10px 15px;
 }
 
 .input-group p {
   margin: 0;
   width: 80px;
+  font-weight: bold; /* 加粗字体 */
+  color: #d38f35; /* 修改颜色 */
+  font-size: large;
 }
 
 .input-group input {
@@ -161,6 +170,7 @@ export default {
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
+  max-width: 300px; /* 限制输入框最大宽度为200px，调整为你需要的值 */
 }
 
 .error {
@@ -169,16 +179,28 @@ export default {
 }
 
 .btn {
+  display: block; /* 使按钮变成块级元素 */
+  margin: 20px auto; /* 上边距为20px，左右自动 */
   text-align: center;
   padding: 10px;
-  margin-top: 20px;
   background-color: #de6700;
   color: white;
-  border-radius: 5px;
+  border-radius: 10px;
+  width: 50%;
   cursor: pointer;
 }
 
 .btn:hover {
   background-color: #ff8e24;
+}
+
+a {
+  text-decoration: underline; /* 添加下划线 */
+  color: rgb(186, 143, 42); /* 设置颜色为蓝色 */
+  cursor: pointer; /* 鼠标悬停时显示为指针 */
+}
+
+a:hover {
+  color: rgb(175, 196, 35); /* 可选：鼠标悬停时颜色变为深蓝色 */
 }
 </style>
