@@ -1,7 +1,7 @@
-<!-- views/MainPage.vue -->
+<!-- views/HomePage.vue -->
 <template>
   <div>
-    <Header :loggedIn="loggedIn" :user="user" />
+    <Header :loggedIn="isLoggedIn" :user="currentUser" />
     <Banner />
     <Carousel :texts="texts" :subtexts="subtexts" :images="images" />
     <main>
@@ -21,19 +21,10 @@
         :comments="comments"
       />
       <DonationSection
+        :loggedIn="isLoggedIn"
+        :user="currentUser"
         :donationList="donationList"
         :scrollDuration="scrollDuration"
-        :isDonationModalVisible="isDonationModalVisible"
-        :donationName="donationName"
-        :donationAmount="donationAmount"
-        :qrCodeImage="qrCodeImage"
-        :errorMessage="errorMessage"
-        :paymentMethod="paymentMethod"
-        @showDonationModal="showDonationModal"
-        @closeDonationModal="closeDonationModal"
-        @donate="donate"
-        @selectPaymentMethod="selectPaymentMethod"
-        @validateDonationAmount="validateDonationAmount"
       />
       <Footer />
     </main>
@@ -41,6 +32,7 @@
 </template>
 
 <script>
+import { mapGetters, mapActions } from "vuex";
 import axios from "axios";
 
 import Header from "@/components/HomeHeader.vue";
@@ -67,12 +59,6 @@ export default {
   },
   data() {
     return {
-      loggedIn: !!localStorage.getItem("token"),
-      user: {
-        name: "",
-        avatar: "",
-      },
-
       texts: [
         {
           text: "在这里，每一口都是关爱",
@@ -131,7 +117,11 @@ export default {
       scrollDuration: 20,
     };
   },
+  computed: {
+    ...mapGetters(["isLoggedIn", "currentUser"]),
+  },
   created() {
+    this.checkAuth(); // 在页面创建时验证 token 是否有效
     this.fetchUserData();
     this.fetchDishs();
     this.getWeekDate();
@@ -141,19 +131,35 @@ export default {
     this.fetchDonations();
   },
   methods: {
+    ...mapActions(["checkAuth", "login", "logout"]),
     fetchUserData() {
-      const user = JSON.parse(localStorage.getItem("user"));
-      if (user) {
-        this.user.name = user.name || "用户";
-        this.user.avatar =
-          user.avatar ||
-          new URL("../assets/defaultportrait.png", import.meta.url).href;
-      } else {
-        console.log("no user");
-        this.user.avatar = new URL(
-          "../assets/defaultportrait.png",
-          import.meta.url
-        ).href;
+      if (this.isLoggedIn) {
+        const token = localStorage.getItem("token");
+        const config = {
+          method: "get",
+          url: "http://8.136.125.61/api/account/getPersonInfo",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        };
+
+        axios(config)
+          .then((response) => {
+            if (response.data.getSuccess) {
+              const user = response.data.response;
+              this.login({
+                name: user.accountName,
+                avatar: user.portrait || this.defaultAvatar,
+                id: user.accountId,
+              });
+            } else {
+              alert(response.data.msg);
+            }
+          })
+          .catch((error) => {
+            console.error("Error fetching user data:", error);
+            alert("获取用户数据失败，请稍后再试");
+          });
       }
     },
 
@@ -164,7 +170,13 @@ export default {
         .then((res) => {
           console.log(res.data); // 检查完整的返回数据
           if (Array.isArray(res.data.response)) {
-            this.menuItems = res.data.response;
+            const temMenuItems = res.data.response.sort(
+              (a, b) => b.sale - a.sale
+            ); // 暂时接收response并按销售量降序排序，等待下一步添加RANK属性
+            this.menuItems = [...temMenuItems].map((item, index) => ({
+              ...item,
+              rank: index + 1, // 排名从1开始
+            }));
           } else {
             console.error("Expected array but got:", res.data.response);
             this.menuItems = []; // 处理非数组数据
@@ -277,7 +289,7 @@ export default {
 
     fetchDonations() {
       axios
-        .get("http://127.0.0.1:4523/m1/4808550-0-default/getDonationList/")
+        .get("https://localhost:7086/api/Donate/getDonationList")
         .then((res) => {
           console.log(res.data); // 检查完整的返回数据
           if (res.data && Array.isArray(res.data.responce)) {

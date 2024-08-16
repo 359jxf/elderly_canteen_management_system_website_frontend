@@ -109,6 +109,15 @@ export default {
   props: {
     donationList: Array,
     scrollDuration: Number,
+    loggedIn: {
+      type: Boolean,
+      required: true,
+    },
+    user: {
+      type: Object,
+      required: true,
+      default: () => ({ name: "", avatar: "", id: "" }),
+    },
   },
   data() {
     return {
@@ -127,6 +136,11 @@ export default {
     },
 
     showDonationModal() {
+      if (!this.loggedIn) {
+        alert("请先登录！");
+        return;
+      }
+      console.log("donate person arealdy loggedin");
       this.isDonationModalVisible = true;
     },
     closeDonationModal() {
@@ -139,30 +153,27 @@ export default {
         this.errorMessage = "请输入大于0的金额";
         return;
       }
-
       // 清空错误消息
       this.errorMessage = "";
 
-      const donationAPI =
-        "http://127.0.0.1:4523/m1/4808550-0-default/postDonation";
+      const donationAPI = "https://localhost:7086/api/Donate/submitDonation";
       const donationData = {
-        accountId: this.user.accountId,
-        amount: this.donationAmount,
+        accountId: this.user.id,
+        price: this.donationAmount,
         origin: this.donationName ? this.donationName : "匿名",
       };
-
       axios
         .post(donationAPI, donationData)
         .then((response) => {
           if (response.data.success) {
             this.message = "捐赠成功！感谢您的支持！";
             alert(this.message);
-            this.fetchDonations(); // 重新获取捐赠列表
+            window.location.reload(); // 重新获取捐赠列表
             this.closeDonationModal(); // 关闭捐赠弹窗
           } else {
             this.message = "捐赠失败，请重试。";
             alert(this.message);
-            this.fetchDonations(); // 重新获取捐赠列表
+            window.location.reload(); // 重新获取捐赠列表
             this.closeDonationModal(); // 关闭捐赠弹窗
           }
         })
@@ -170,7 +181,7 @@ export default {
           console.error("捐赠失败", error);
           this.message = "捐赠失败，请重试。";
           alert(this.message);
-          this.fetchDonations(); // 重新获取捐赠列表
+          window.location.reload(); // 重新获取捐赠列表
           this.closeDonationModal(); // 关闭捐赠弹窗
         })
         .finally(() => {
@@ -234,8 +245,8 @@ export default {
   width: 15%;
   margin-top: 10px;
   padding: 20px 20px;
-  background-color: rgba(255, 255, 255, 0.5);
-  color: #c47300;
+  background-color: rgba(203, 127, 27, 0.798);
+  color: #e6e6e6;
   border: none;
   border-radius: 10px;
   cursor: pointer;
@@ -244,8 +255,8 @@ export default {
 }
 
 .donate-button:hover {
-  color: #e58500;
-  background-color: rgba(255, 255, 255, 0.7);
+  color: #ffffff;
+  background-color: rgb(255, 150, 30);
 }
 .donation-section {
   overflow: hidden;

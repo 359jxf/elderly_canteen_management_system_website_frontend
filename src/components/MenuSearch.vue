@@ -30,6 +30,7 @@
           </div>
         </div>
       </div>
+      <!--没有进行搜索的情况（初始化）-->
       <div class="menuChart">
         <div v-if="searchResult.length == 0 && searchQuery == ''">
           <div v-for="item in menuItems" :key="item.id" class="menuItem">
@@ -52,6 +53,7 @@
             </div>
           </div>
         </div>
+        <!--成功搜索的情况-->
         <div v-else-if="searchResult.length != 0">
           <div v-for="item in searchResult" :key="item.id" class="menuItem">
             <div class="rank">{{ item.rank }}</div>
@@ -73,6 +75,7 @@
             </div>
           </div>
         </div>
+        <!--搜索失败-->
         <div v-else>
           <div class="menuItem" id="noneItem">暂无信息</div>
         </div>

@@ -72,12 +72,9 @@ export default {
           if (response.data.success) {
             // 更新密码的逻辑
             axios
-              .post(
-                "https://apifoxmock.com/m1/4808550-4462943-default/api/updatePassword",
-                {
-                  newPassword: this.newPassword,
-                }
-              )
+              .post("http://8.136.125.61/changePassword", {
+                newPassword: this.newPassword,
+              })
               .then((response) => {
                 if (response.data.success) {
                   this.$emit("close");

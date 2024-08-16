@@ -9,6 +9,7 @@
             v-model="phonenumber"
             placeholder="请输入手机号"
             class="input-item"
+            @input="validatePhoneNumber"
           />
           <div class="otp">
             <input
@@ -29,7 +30,7 @@
               {{ buttonText }}
             </button>
           </div>
-          <a href="/">切换到手机号密码登录>></a>
+          <a href="/login">切换到手机号密码登录>></a>
           <div class="btn" @click="login">登录</div>
         </div>
         <div class="msg">
@@ -56,7 +57,19 @@ export default {
     };
   },
   methods: {
+    validatePhoneNumber() {
+      // 只保留数字
+      this.phonenumber = this.phonenumber.replace(/\D/g, "");
+      // 限制最大长度为11位
+      if (this.phonenumber.length > 11) {
+        this.phonenumber = this.phonenumber.slice(0, 11);
+      }
+    },
     async login() {
+      if (this.phonenumber.length !== 11) {
+        alert("手机号必须为11位数字");
+        return;
+      }
       if (!this.phonenumber || !this.otp) {
         alert("手机号和验证码不能为空！");
       }

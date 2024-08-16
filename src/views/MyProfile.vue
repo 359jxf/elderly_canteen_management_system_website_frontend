@@ -38,7 +38,7 @@
           </div>
           <div class="input-group">
             <p>性别</p>
-            <div v-if="!isEditing">{{ gender }}</div>
+            <div v-if="!isEditing">{{ translatedGender }}</div>
             <select v-else v-model="gender" class="input-item">
               <option value="">选择性别</option>
               <option value="male">男</option>
@@ -74,6 +74,7 @@
           >
             {{ isEditing ? "确认修改" : "编辑个人信息" }}
           </div>
+          <div class="btn" v-if="!isEditing" @click="logout">退出登录</div>
         </div>
       </div>
     </div>
@@ -89,6 +90,7 @@
 </template>
 
 <script>
+import { mapActions } from "vuex";
 import axios from "axios";
 import ChangePasswordModal from "../components/ChangePasswordModal.vue";
 import ChangePhoneModal from "../components/ChangePhoneModal.vue";
@@ -117,14 +119,24 @@ export default {
   created() {
     this.fetchUserData(); // 组件创建时获取用户数据
   },
+  computed: {
+    translatedGender() {
+      return this.gender === "male"
+        ? "男"
+        : this.gender === "female"
+        ? "女"
+        : "";
+    },
+  },
   methods: {
+    ...mapActions(["logout"]),
     // 获取用户数据
     fetchUserData() {
       const token = localStorage.getItem("token"); // 获取存储的 token
 
       const config = {
         method: "get",
-        url: "http://127.0.0.1:4523/m1/4808550-0-default/api/account/getPersonInfo",
+        url: "http://8.136.125.61/api/account/getPersonInfo",
         headers: {
           Authorization: `Bearer ${token}`, // 在请求头中包含 token
         },
@@ -167,23 +179,21 @@ export default {
         phoneNum: this.phone,
         gender: this.gender,
         birthDate: this.birthdate,
-        portrait: this.avatar ? this.avatar : this.avatarPreview, // 如果没有上传新头像，则使用当前头像
+        portrait: "",
+
+        // portrait: this.avatar ? this.avatar : this.avatarPreview, // 如果没有上传新头像，则使用当前头像
         address: "", // 你可以在这里添加或处理地址字段
         name: "", // 你可以在这里添加或处理其他字段
       };
 
-      const formData = new FormData();
-      for (const key in data) {
-        formData.append(key, data[key]);
-      }
-
       const config = {
         method: "post",
-        url: "http://127.0.0.1:4523/m1/4808550-0-default/api/Account/alterPersonInfo",
+        url: "http://8.136.125.61/api/Account/alterPersonInfo",
         headers: {
           Authorization: `Bearer ${token}`, // 在请求头中包含 token
+          "Content-Type": "application/json", // 设置 Content-Type 为 application/json
         },
-        data: formData,
+        data: JSON.stringify(data), // 将数据对象转换为 JSON 字符串
       };
 
       axios(config)
@@ -338,12 +348,11 @@ button {
 
 .btn {
   width: 40%;
-  padding: 15px;
-  margin: 20px 0;
+  padding: 10px;
+  margin: 10px 0;
   text-align: center;
   background-color: #de6700;
   color: white;
-  font-weight: bold;
   font-size: 120%;
   border-radius: 5px;
   cursor: pointer;

@@ -32,8 +32,15 @@
 <script>
 export default {
   props: {
-    loggedIn: Boolean,
-    user: Object,
+    loggedIn: {
+      type: Boolean,
+      required: true,
+    },
+    user: {
+      type: Object,
+      required: true,
+      default: () => ({ name: "", avatar: "", id: "" }),
+    },
   },
   methods: {
     goToLogin() {
@@ -102,7 +109,7 @@ nav ul li a:hover {
 }
 .username {
   margin-left: 10px;
-  font-size: 18px;
+  font-size: 14px;
   color: #ffffff;
 }
 

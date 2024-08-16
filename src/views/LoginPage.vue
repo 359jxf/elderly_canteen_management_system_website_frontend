@@ -9,6 +9,7 @@
             v-model="phonenumber"
             placeholder="请输入手机号"
             class="input-item"
+            @input="validatePhoneNumber"
           />
           <div class="psd">
             <input
@@ -44,7 +45,19 @@ export default {
     };
   },
   methods: {
+    validatePhoneNumber() {
+      // 只保留数字
+      this.phonenumber = this.phonenumber.replace(/\D/g, "");
+      // 限制最大长度为11位
+      if (this.phonenumber.length > 11) {
+        this.phonenumber = this.phonenumber.slice(0, 11);
+      }
+    },
     async login() {
+      if (this.phonenumber.length !== 11) {
+        alert("手机号必须为11位数字");
+        return;
+      }
       if (!this.phonenumber || !this.password) {
         alert("手机号和密码不能为空！");
         return;
