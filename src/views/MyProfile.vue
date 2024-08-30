@@ -151,7 +151,10 @@ export default {
             this.phone = user.phoneNum;
             this.gender = user.gender;
             this.birthdate = user.birthDate;
-            this.avatarPreview = user.portrait || this.defaultAvatar;
+            // 拼接完整的图片URL
+            this.avatarPreview = user.portrait
+              ? `http://8.136.125.61${user.portrait}`
+              : this.defaultAvatar;
           } else {
             alert(response.data.msg); // 显示错误信息
           }
@@ -170,34 +173,42 @@ export default {
       }
     },
     // 更新用户信息
-    updateProfile() {
+    async updateProfile() {
       const token = localStorage.getItem("token"); // 获取存储的 token
 
-      // 构建请求数据
-      const data = {
-        accountName: this.username,
-        phoneNum: this.phone,
-        gender: this.gender,
-        birthDate: this.birthdate,
-        portrait: "",
+      // 构建 FormData 对象
+      const formData = new FormData();
+      formData.append("accountName", this.username);
+      formData.append("phoneNum", this.phone);
+      formData.append("gender", this.gender);
+      formData.append("birthDate", this.birthdate || "");
+      formData.append("address", ""); // 可根据实际需求修改
+      formData.append("name", ""); // 可根据实际需求修改
 
-        // portrait: this.avatar ? this.avatar : this.avatarPreview, // 如果没有上传新头像，则使用当前头像
-        address: "", // 你可以在这里添加或处理地址字段
-        name: "", // 你可以在这里添加或处理其他字段
-      };
+      if (this.avatar) {
+        formData.append("avatar", this.avatar); // 仅在用户选择新头像时才添加
+      } else {
+        // 将默认头像URL转换为Blob，然后添加到FormData中
+        const response = await fetch(this.defaultAvatar);
+        const blob = await response.blob();
+        const defaultAvatarFile = new File([blob], "defaultAvatar.png", {
+          type: "image/png",
+        });
+        formData.append("avatar", defaultAvatarFile);
+      }
 
       const config = {
         method: "post",
         url: "http://8.136.125.61/api/Account/alterPersonInfo",
         headers: {
           Authorization: `Bearer ${token}`, // 在请求头中包含 token
-          "Content-Type": "application/json", // 设置 Content-Type 为 application/json
         },
-        data: JSON.stringify(data), // 将数据对象转换为 JSON 字符串
+        data: formData,
       };
 
       axios(config)
         .then((response) => {
+          console.log(response.data);
           if (response.data.alterSuccess) {
             alert("个人信息修改成功！"); // 修改成功提示
             // 更新 localStorage 中的用户信息

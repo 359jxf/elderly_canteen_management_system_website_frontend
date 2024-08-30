@@ -95,12 +95,9 @@ export default {
           }
         } else {
           // 一些其他的错误
-          alert("登录失败nothing");
+          alert("登录失败");
         }
       }
-    },
-    register() {
-      this.$router.push("/register");
     },
   },
 };

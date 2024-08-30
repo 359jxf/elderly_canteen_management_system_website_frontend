@@ -130,11 +130,10 @@ export default {
       if (file) {
         const reader = new FileReader();
         reader.onloadend = () => {
-          this.avatar = reader.result; // 将 Base64 字符串赋值给 this.avatar
-          this.avatarPreview = reader.result; // 预览 URL 也可以使用 Base64 字符串
-          console.log(this.avatarPreview);
+          this.avatar = file;
+          this.avatarPreview = reader.result;
         };
-        reader.readAsDataURL(file); // 读取文件并转换为 Base64
+        reader.readAsDataURL(file);
       }
     },
     register() {
@@ -143,7 +142,7 @@ export default {
         !this.password ||
         !this.confirmPassword ||
         !this.phone ||
-        // !this.verificationCode ||
+        !this.verificationCode ||
         !this.gender
       ) {
         this.showError("请填写所有必填项");
@@ -155,7 +154,19 @@ export default {
         return;
       }
 
-      if (!this.avatar) {
+      // 构建 FormData 对象
+      const formData = new FormData();
+      formData.append("userName", this.username);
+      formData.append("password", this.password);
+      formData.append("phone", this.phone);
+      formData.append("verificationCode", this.verificationCode || "");
+      formData.append("gender", this.gender);
+      formData.append("birthDate", this.birthdate || ""); // 如果生日为空，则传递空字符串
+
+      if (this.avatar) {
+        formData.append("avatar", this.avatar); // 如果有上传头像，则添加到 FormData 中
+      } else {
+        // 将默认头像URL转换为Blob，然后添加到FormData中
         const img = new Image();
         img.src = this.defaultAvatar;
         img.onload = () => {
@@ -164,40 +175,36 @@ export default {
           canvas.height = img.height;
           const ctx = canvas.getContext("2d");
           ctx.drawImage(img, 0, 0);
-          this.defaultAvatar = canvas.toDataURL("image/png");
-          console.log(this.defaultAvatar);
+          canvas.toBlob((blob) => {
+            const defaultAvatarFile = new File([blob], "defaultAvatar.png", {
+              type: "image/png",
+            });
+            formData.append("avatar", defaultAvatarFile);
+            this.sendRegisterRequest(formData); // 发送注册请求
+          });
         };
+        return; // 防止代码继续执行，等待头像处理完成
       }
 
-      // 构建请求数据
-      const data = {
-        userName: this.username,
-        password: this.password,
-        phone: this.phone,
-        verificationCode: this.verificationCode ? this.verificationCode : "",
-        avatar: this.avatar ? this.avatar : this.defaultAvatar, // 如果没有上传头像，则传递默认头像
-        gender: this.gender,
-        birthDate: this.birthdate || "", // 如果生日为空，则传递空字符串
-      };
+      this.sendRegisterRequest(formData); // 发送注册请求
+    },
 
+    sendRegisterRequest(formData) {
       const config = {
         method: "post",
         url: "http://8.136.125.61/api/account/register",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        data: JSON.stringify(data), // 使用 JSON.stringify 序列化数据对象
+        data: formData,
       };
 
       axios(config)
         .then((response) => {
           if (response.data.msg === "注册成功") {
             // 将 Token 存储在 localStorage
-            localStorage.setItem("token", response.data.token);
+            localStorage.setItem("token", response.data.response.token);
             console.log(response.data.response);
             this.showSuccess("注册成功！");
           } else {
-            this.showError(response.data.message);
+            this.showError(response.data.msg);
           }
         })
         .catch((error) => {
@@ -205,6 +212,7 @@ export default {
           this.showError("注册失败，请稍后再试");
         });
     },
+
     sendOTP() {
       // 发送验证码逻辑
       this.isButtonDisabled = true;

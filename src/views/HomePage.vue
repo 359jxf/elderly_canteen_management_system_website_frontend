@@ -235,13 +235,13 @@ export default {
           "http://127.0.0.1:4523/m1/4808550-4462943-default/getWeekmenuAndWeekDiscount"
         );
         const menuItems = response.data.response;
-        this.mon = menuItems.filter((item) => item.WEEK === this.weekdays[0]);
-        this.tue = menuItems.filter((item) => item.WEEK === this.weekdays[1]);
-        this.wed = menuItems.filter((item) => item.WEEK === this.weekdays[2]);
-        this.thu = menuItems.filter((item) => item.WEEK === this.weekdays[3]);
-        this.fri = menuItems.filter((item) => item.WEEK === this.weekdays[4]);
-        this.sat = menuItems.filter((item) => item.WEEK === this.weekdays[5]);
-        this.sun = menuItems.filter((item) => item.WEEK === this.weekdays[6]);
+        this.mon = menuItems.filter((item) => item.week === this.weekdays[0]);
+        this.tue = menuItems.filter((item) => item.week === this.weekdays[1]);
+        this.wed = menuItems.filter((item) => item.week === this.weekdays[2]);
+        this.thu = menuItems.filter((item) => item.week === this.weekdays[3]);
+        this.fri = menuItems.filter((item) => item.week === this.weekdays[4]);
+        this.sat = menuItems.filter((item) => item.week === this.weekdays[5]);
+        this.sun = menuItems.filter((item) => item.week === this.weekdays[6]);
       } catch (error) {
         console.error("Failed to fetch menus:", error);
       }
@@ -256,8 +256,8 @@ export default {
         this.dishOnSale = menuItems.filter(
           (item) =>
             "DIS_PRICE" in item &&
-            item.DIS_PRICE !== undefined &&
-            this.weekdays.includes(item.WEEK)
+            item.disPrice !== undefined &&
+            this.weekdays.includes(item.week)
         );
       } catch (error) {
         console.error("Failed to fetch menus:", error);
@@ -273,8 +273,8 @@ export default {
         let totalStars = 0;
         let commentsCount = 0;
         this.comments.forEach((comment) => {
-          if (comment.C_STARS != null) {
-            totalStars += comment.C_STARS;
+          if (comment.cStars != null) {
+            totalStars += comment.cStars;
             commentsCount++;
           }
         });
@@ -289,7 +289,7 @@ export default {
 
     fetchDonations() {
       axios
-        .get("https://localhost:7086/api/Donate/getDonationList")
+        .get("http://8.136.125.61/api/Donate/getDonationList")
         .then((res) => {
           console.log(res.data); // 检查完整的返回数据
           if (res.data && Array.isArray(res.data.responce)) {

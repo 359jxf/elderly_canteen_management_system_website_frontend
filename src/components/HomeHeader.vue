@@ -15,12 +15,12 @@
     <div class="header-right">
       <template v-if="loggedIn">
         <img
-          :src="user.avatar"
+          :src="avatarPreview"
           alt="Avatar"
           class="avatar"
           @click="goToProfile"
         />
-        <span class="username">{{ user.name }}，你好！</span>
+        <span class="username">{{ username }}，你好！</span>
       </template>
       <template v-else>
         <button @click="goToLogin" class="login-button">登录</button>
@@ -30,17 +30,23 @@
 </template>
 
 <script>
+import axios from "axios";
 export default {
   props: {
     loggedIn: {
       type: Boolean,
       required: true,
     },
-    user: {
-      type: Object,
-      required: true,
-      default: () => ({ name: "", avatar: "", id: "" }),
-    },
+  },
+  data() {
+    return {
+      username: "",
+      avatarPreview: this.defaultAvatar, // 默认头像
+      defaultAvatar: require("@/assets/defaultportrait.png"), // 默认头像路径
+    };
+  },
+  created() {
+    this.fetchUserData();
   },
   methods: {
     goToLogin() {
@@ -48,6 +54,35 @@ export default {
     },
     goToProfile() {
       this.$router.push("/profile");
+    },
+    fetchUserData() {
+      const token = localStorage.getItem("token"); // 获取存储的 token
+
+      const config = {
+        method: "get",
+        url: "http://8.136.125.61/api/account/getPersonInfo",
+        headers: {
+          Authorization: `Bearer ${token}`, // 在请求头中包含 token
+        },
+      };
+
+      axios(config)
+        .then((response) => {
+          if (response.data.getSuccess) {
+            const user = response.data.response;
+            // 更新用户名和头像
+            this.username = user.accountName;
+            this.avatarPreview = user.portrait
+              ? `http://8.136.125.61${user.portrait}`
+              : this.defaultAvatar;
+          } else {
+            alert(response.data.msg); // 显示错误信息
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching user data:", error);
+          // alert("获取用户数据失败，请稍后再试");
+        });
     },
   },
 };

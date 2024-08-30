@@ -65,43 +65,74 @@ export default {
         this.phonenumber = this.phonenumber.slice(0, 11);
       }
     },
+    async sendOTP() {
+      if (this.phonenumber.length !== 11) {
+        alert("手机号必须为11位数字");
+        return;
+      }
+
+      try {
+        const response = await axios.post(
+          "http://8.136.125.61/api/Account/sendOTP",
+          {
+            PhoneNum: this.phonenumber,
+          }
+        );
+        console.log(response);
+        if (response.data.success) {
+          this.isButtonDisabled = true;
+          this.buttonText = `${this.countdown}s后重新发送`;
+
+          const countdownInterval = setInterval(() => {
+            if (this.countdown > 1) {
+              this.countdown--;
+              this.buttonText = `${this.countdown}s后重新发送`;
+            } else {
+              clearInterval(countdownInterval);
+              this.resetButton();
+            }
+          }, 1000);
+        } else {
+          alert(response.data.msg);
+        }
+      } catch (error) {
+        alert("发送验证码失败");
+      }
+    },
     async login() {
       if (this.phonenumber.length !== 11) {
         alert("手机号必须为11位数字");
         return;
       }
-      if (!this.phonenumber || !this.otp) {
-        alert("手机号和验证码不能为空！");
+      if (!this.otp) {
+        alert("验证码不能为空！");
       }
+      console.log(this.phonenumber);
+      console.log(this.otp);
       try {
-        const res = await axios.post(
-          "https://localhost:7289/api/accounts/login",
+        const response = await axios.post(
+          "http://8.136.125.61/api/Account/verifiationCodeLogin",
           {
-            phone: this.phonenumber,
-            OTP: this.otp,
+            PhoneNum: this.phonenumber,
+            Code: this.otp,
           }
         );
-
-        if (res.data.success) {
-          console.log("Login successful");
-          console.log("Token:", res.data.response.token);
-          console.log("Role:", res.data.response.role);
-          console.log("Username:", res.data.response.username);
-
+        console.log(response);
+        if (response.data.success) {
           // 将 Token 存储在 localStorage
-          localStorage.setItem("token", res.data.response.token);
+          localStorage.setItem("token", response.data.response.token);
           // 跳转到 /home 页面
           this.$router.push("/home");
         } else {
-          alert(res.data.msg);
+          alert(response.data.msg);
         }
       } catch (error) {
-        if (error.res) {
+        if (error.response) {
           // 请求已发出，但服务器响应的状态码不在 2xx 范围内
-          if (error.res.status === 404) {
+          if (error.response.status === 404) {
             alert("记录不存在");
-          } else if (error.res.status === 400) {
-            alert("密码不正确");
+          } else if (error.response.status === 400) {
+            alert("验证码不正确");
           } else {
             alert("登录失败");
           }
@@ -110,21 +141,6 @@ export default {
           alert("登录失败");
         }
       }
-    },
-    sendOTP() {
-      // 发送验证码逻辑
-      this.isButtonDisabled = true;
-      this.buttonText = `成功发送，${this.countdown}s后重新发送`;
-
-      const countdownInterval = setInterval(() => {
-        if (this.countdown > 1) {
-          this.countdown--;
-          this.buttonText = `成功发送，${this.countdown}s后重新发送`;
-        } else {
-          clearInterval(countdownInterval);
-          this.resetButton();
-        }
-      }, 1000);
     },
     resetButton() {
       this.buttonText = "发送验证码";

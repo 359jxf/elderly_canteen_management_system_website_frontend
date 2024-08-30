@@ -4,32 +4,33 @@
       <div class="header">忘记密码</div>
 
       <div class="inputpart" v-if="step === 1">
-        <label for="phonenumber">请输入手机号:</label>
         <input
-          type="text"
+          type="tel"
           v-model="phonenumber"
-          id="phonenumber"
-          placeholder="手机号"
+          placeholder="请输入手机号"
+          class="input-item"
           @input="validatePhoneNumber"
         />
-        <button :disabled="isButtonDisabled || !phonenumber" @click="sendOTP">
-          {{ buttonText }}
-        </button>
-
-        <label
-          for="otp"
-          v-if="otpSent"
-          style="margin-top: 10px; font-size: 15px"
-          >请输入验证码:</label
-        >
-        <input
-          type="text"
-          v-if="otpSent"
-          v-model="otp"
-          id="otp"
-          placeholder="验证码"
-        />
-        <button v-if="otpSent" @click="verifyOTP">下一步</button>
+        <div class="otp">
+          <input
+            type="text"
+            v-model="otp"
+            placeholder="验证码"
+            class="input-item"
+            style="width: 60%"
+          />
+          <button
+            :class="{
+              disabledButton: isButtonDisabled,
+              enabledButton: !isButtonDisabled,
+            }"
+            :disabled="isButtonDisabled"
+            @click="sendOTP"
+          >
+            {{ buttonText }}
+          </button>
+        </div>
+        <button @click="verifyOTP">下一步</button>
       </div>
 
       <div class="inputpart" v-else-if="step === 2">
@@ -74,7 +75,6 @@ export default {
       isButtonDisabled: false,
       countdown: 60,
       showSuccessMessage: false,
-      otpSent: false, // 标识是否已经发送了验证码
     };
   },
   methods: {
@@ -86,82 +86,91 @@ export default {
         this.phonenumber = this.phonenumber.slice(0, 11);
       }
     },
-    sendOTP() {
+    async sendOTP() {
       if (this.phonenumber.length !== 11) {
         alert("手机号必须为11位数字");
         return;
       }
 
-      this.isButtonDisabled = true;
-      this.buttonText = `成功发送，${this.countdown}s后重新发送`;
-
-      // 发送验证码请求
-      axios
-        .post(
-          "http://127.0.0.1:4523/m1/4808550-4462943-default/api/account/sendOTP",
-          { phoneNum: this.phonenumber }
-        )
-        .then((response) => {
-          if (response.data.success) {
-            alert("验证码已发送到您的手机");
-            this.otpSent = true;
-            this.startCountdown();
-          } else {
-            alert(response.data.msg || "验证码发送失败，请稍后重试");
-            this.resetButton();
+      try {
+        const response = await axios.post(
+          "http://8.136.125.61/api/Account/sendOTP",
+          {
+            PhoneNum: this.phonenumber,
           }
-        })
-        .catch((error) => {
-          console.error("发送验证码失败", error);
-          alert("验证码发送失败，请稍后再试");
-          this.resetButton();
-        });
-    },
-    startCountdown() {
-      const countdownInterval = setInterval(() => {
-        if (this.countdown > 1) {
-          this.countdown--;
-          this.buttonText = `成功发送，${this.countdown}s后重新发送`;
+        );
+        console.log(response);
+        if (response.data.success) {
+          this.isButtonDisabled = true;
+          this.buttonText = `${this.countdown}s后重新发送`;
+
+          const countdownInterval = setInterval(() => {
+            if (this.countdown > 1) {
+              this.countdown--;
+              this.buttonText = `${this.countdown}s后重新发送`;
+            } else {
+              clearInterval(countdownInterval);
+              this.resetButton();
+            }
+          }, 1000);
         } else {
-          clearInterval(countdownInterval);
-          this.resetButton();
+          alert(response.data.msg);
         }
-      }, 1000);
+      } catch (error) {
+        alert("发送验证码失败");
+      }
     },
     resetButton() {
       this.buttonText = "发送验证码";
       this.isButtonDisabled = false;
       this.countdown = 60;
     },
-    verifyOTP() {
+    async verifyOTP() {
+      if (this.phonenumber.length !== 11) {
+        alert("手机号必须为11位数字");
+        return;
+      }
       if (!this.otp) {
-        alert("请输入验证码");
+        alert("验证码不能为空！");
         return;
       }
 
-      // 验证验证码请求
-      axios
-        .post(
-          "http://127.0.0.1:4523/m1/4808550-4462943-default/api/account/verifyOTP",
+      console.log(this.phonenumber);
+      console.log(this.otp);
+      try {
+        const response = await axios.post(
+          "http://8.136.125.61/api/Account/verifiationCodeLogin",
           {
-            phoneNum: this.phonenumber,
-            verifyCode: this.otp,
+            PhoneNum: this.phonenumber,
+            Code: this.otp,
           }
-        )
-        .then((response) => {
-          if (response.data.success) {
-            alert("验证码验证成功");
-            this.step = 2;
+        );
+        console.log(response);
+        if (response.data.success) {
+          // 将 Token 存储在 localStorage
+          localStorage.setItem("token", response.data.response.token);
+          alert("验证成功");
+          this.step = 2;
+        } else {
+          alert(response.data.msg);
+        }
+      } catch (error) {
+        if (error.response) {
+          // 请求已发出，但服务器响应的状态码不在 2xx 范围内
+          if (error.response.status === 404) {
+            alert("记录不存在");
+          } else if (error.response.status === 400) {
+            alert("验证码不正确");
           } else {
-            alert(response.data.msg || "验证码验证失败，请重试");
+            alert("验证失败");
           }
-        })
-        .catch((error) => {
-          console.error("验证码验证失败", error);
-          alert("验证码验证失败，请稍后再试");
-        });
+        } else {
+          // 一些其他的错误
+          alert("验证失败");
+        }
+      }
     },
-    resetPassword() {
+    async resetPassword() {
       if (!this.newPassword || !this.confirmPassword) {
         alert("请输入新密码和确认密码");
         return;
@@ -171,41 +180,42 @@ export default {
         alert("两次输入的密码不一致");
         return;
       }
-
-      const data = {
-        phoneNum: this.phonenumber,
-        verifyCode: this.otp,
-        newPassword: this.newPassword,
-      };
-
-      axios
-        .post(
-          "http://127.0.0.1:4523/m1/4808550-4462943-default/changePassword",
-          data
-        )
-        .then((response) => {
-          if (response.data.changeSuccess) {
-            console.log("Login successful");
-            console.log("Token:", response.data.response.token);
-            console.log("Role:", response.data.response.identity);
-            console.log("Username:", response.data.resposnse.accountName);
-
-            // 将 Token 存储在 localStorage
-            localStorage.setItem("token", response.data.response.token);
-
-            this.showSuccessMessage = true;
-            alert(response.data.msg);
-            setTimeout(() => {
-              this.$router.push("/Home");
-            }, 2000);
-          } else {
-            alert(response.data.msg || "密码重置失败，请稍后重试");
+      const token = localStorage.getItem("token");
+      try {
+        const response = await axios.post(
+          `http://8.136.125.61/api/Account/changePassword?pswd=${this.newPassword}`,
+          {},
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
           }
-        })
-        .catch((error) => {
+        );
+        console.log(response);
+        if (response.data.success) {
+          this.showSuccessMessage = true;
+          alert(response.data.msg);
+          setTimeout(() => {
+            this.$router.push("/login");
+          }, 2000);
+        } else {
+          alert(response.data.msg || "密码重置失败，请稍后重试");
+        }
+      } catch (error) {
+        if (error.response) {
+          // 请求已发出，但服务器响应的状态码不在 2xx 范围内
+          if (error.response.status === 401) {
+            alert("用户验证错误");
+          } else {
+            console.error("密码重置失败", error);
+            alert("密码重置失败，请稍后再试");
+          }
+        } else {
           console.error("密码重置失败", error);
           alert("密码重置失败，请稍后再试");
-        });
+        }
+      }
     },
   },
 };
@@ -260,6 +270,38 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 350px;
+}
+
+.input-item {
+  display: block;
+  width: 100%;
+  margin-bottom: 20px;
+  border: none;
+  border-bottom: 2px solid #ccc;
+  background: none;
+  font-size: 16px;
+  outline: none;
+  color: #fff;
+  transition: border-color 0.3s;
+}
+
+.otp {
+  width: 350px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.enabledButton {
+  background-color: rgba(72, 45, 8, 0.5);
+}
+.enabledButton:hover {
+  background-color: darkorange;
+}
+.disabledButton {
+  background-color: rgba(72, 45, 8, 0.5);
+  cursor: not-allowed;
 }
 
 button {
@@ -271,19 +313,15 @@ button {
   border-radius: 10px;
   transition: background-color 0.3s;
   cursor: pointer;
+  max-width: 150px;
 }
 
 button:hover {
   background-color: darkorange;
 }
 
-button:disabled {
-  background-color: #6c757d;
-  cursor: not-allowed;
-}
-
 input {
-  margin: 20px;
+  margin: 20px 0;
   display: block;
   border: none;
   border-bottom: 2px solid #ccc;
