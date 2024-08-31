@@ -1,5 +1,8 @@
 <!-- components/DonationSection.vue -->
 <template>
+  <transition name="fade">
+    <div v-if="showMessage" class="message-popup">{{ showMessage }}</div>
+  </transition>
   <section id="donateNav">
     <div class="donation">
       <div class="donation-info">
@@ -63,9 +66,6 @@
             v-model="donationAmount"
             @input="validateDonationAmount"
           />
-          <div v-if="errorMessage" class="error-message">
-            {{ errorMessage }}
-          </div>
           <div class="payment-methods">
             <button
               class="wechat"
@@ -125,8 +125,7 @@ export default {
       donationName: "",
       donationAmount: 0,
       qrCodeImage,
-      message: "", // 新增的 message 数据属性,用于捐赠弹窗
-      errorMessage: "",
+      showMessage: "",
     };
   },
   methods: {
@@ -137,7 +136,7 @@ export default {
 
     showDonationModal() {
       if (!this.loggedIn) {
-        alert("请先登录！");
+        this.show("请先登录！");
         return;
       }
       console.log("donate person arealdy loggedin");
@@ -145,18 +144,15 @@ export default {
     },
     closeDonationModal() {
       this.isDonationModalVisible = false;
-      this.message = ""; // 清空提示信息
     },
     donate() {
       // 验证输入金额是否大于0
       if (this.donationAmount <= 0) {
-        this.errorMessage = "请输入大于0的金额";
+        this.show("请输入大于0的金额");
         return;
       }
-      // 清空错误消息
-      this.errorMessage = "";
 
-      const donationAPI = "http://8.136.125.61/api/Donate/submitDonation";
+      const donationAPI = "https://localhost:7086/api/Donate/submitDonation";
       const donationData = {
         accountId: this.user.id,
         price: this.donationAmount,
@@ -166,21 +162,18 @@ export default {
         .post(donationAPI, donationData)
         .then((response) => {
           if (response.data.success) {
-            this.message = "捐赠成功！感谢您的支持！";
-            alert(this.message);
+            this.show("捐赠成功！感谢您的支持！");
             window.location.reload(); // 重新获取捐赠列表
             this.closeDonationModal(); // 关闭捐赠弹窗
           } else {
-            this.message = "捐赠失败，请重试。";
-            alert(this.message);
+            this.show("捐赠失败，请重试。");
             window.location.reload(); // 重新获取捐赠列表
             this.closeDonationModal(); // 关闭捐赠弹窗
           }
         })
         .catch((error) => {
           console.error("捐赠失败", error);
-          this.message = "捐赠失败，请重试。";
-          alert(this.message);
+          this.show("捐赠失败，请重试。");
           window.location.reload(); // 重新获取捐赠列表
           this.closeDonationModal(); // 关闭捐赠弹窗
         })
@@ -200,6 +193,12 @@ export default {
       if (decimalIndex >= 0 && value.length - decimalIndex - 1 > 2) {
         this.donationAmount = parseFloat(value).toFixed(2);
       }
+    },
+    show(message) {
+      this.showMessage = message;
+      setTimeout(() => {
+        this.showMessage = "";
+      }, 3000);
     },
   },
 };
@@ -313,7 +312,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 900;
 }
 
 .modal-content {
@@ -428,10 +427,6 @@ export default {
   height: auto;
 }
 
-.error-message {
-  color: red;
-}
-
 .confirm-button {
   padding: 5%;
   background-color: #ff5f82;
@@ -458,5 +453,19 @@ export default {
   border-radius: 5px;
   font-size: 16px;
   opacity: 0.9;
+}
+
+.message-popup {
+  position: fixed;
+  top: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.6);
+  color: rgb(255, 255, 255);
+  padding: 10px 20px;
+  border-radius: 5px;
+  z-index: 999;
+  opacity: 1;
+  transition: opacity 0.5s ease-in-out;
 }
 </style>

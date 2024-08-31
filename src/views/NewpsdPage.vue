@@ -1,5 +1,8 @@
 <template>
   <div class="container">
+    <transition name="fade">
+      <div v-if="showMessage" class="message-popup">{{ showMessage }}</div>
+    </transition>
     <div class="wrapper">
       <div class="header">忘记密码</div>
 
@@ -75,6 +78,7 @@ export default {
       isButtonDisabled: false,
       countdown: 60,
       showSuccessMessage: false,
+      showMessage: "",
     };
   },
   methods: {
@@ -88,13 +92,13 @@ export default {
     },
     async sendOTP() {
       if (this.phonenumber.length !== 11) {
-        alert("手机号必须为11位数字");
+        this.show("手机号必须为11位数字");
         return;
       }
 
       try {
         const response = await axios.post(
-          "http://8.136.125.61/api/Account/sendOTP",
+          "https://localhost:7086/api/Account/sendOTP",
           {
             PhoneNum: this.phonenumber,
           }
@@ -114,10 +118,10 @@ export default {
             }
           }, 1000);
         } else {
-          alert(response.data.msg);
+          this.show(response.data.msg);
         }
       } catch (error) {
-        alert("发送验证码失败");
+        this.show("发送验证码失败");
       }
     },
     resetButton() {
@@ -127,19 +131,18 @@ export default {
     },
     async verifyOTP() {
       if (this.phonenumber.length !== 11) {
-        alert("手机号必须为11位数字");
+        this.show("手机号必须为11位数字");
         return;
       }
       if (!this.otp) {
-        alert("验证码不能为空！");
-        return;
+        this.show("验证码不能为空！");
       }
 
       console.log(this.phonenumber);
       console.log(this.otp);
       try {
         const response = await axios.post(
-          "http://8.136.125.61/api/Account/verifiationCodeLogin",
+          "https://localhost:7086/api/Account/verifiationCodeLogin",
           {
             PhoneNum: this.phonenumber,
             Code: this.otp,
@@ -149,41 +152,41 @@ export default {
         if (response.data.success) {
           // 将 Token 存储在 localStorage
           localStorage.setItem("token", response.data.response.token);
-          alert("验证成功");
+          this.show("验证成功");
           this.step = 2;
         } else {
-          alert(response.data.msg);
+          this.show(response.data.msg);
         }
       } catch (error) {
         if (error.response) {
           // 请求已发出，但服务器响应的状态码不在 2xx 范围内
           if (error.response.status === 404) {
-            alert("记录不存在");
+            this.show("用户不存在");
           } else if (error.response.status === 400) {
-            alert("验证码不正确");
+            this.show("验证码不正确");
           } else {
-            alert("验证失败");
+            this.show("验证失败");
           }
         } else {
           // 一些其他的错误
-          alert("验证失败");
+          this.show("验证失败");
         }
       }
     },
     async resetPassword() {
       if (!this.newPassword || !this.confirmPassword) {
-        alert("请输入新密码和确认密码");
+        this.show("请输入新密码和确认密码");
         return;
       }
 
       if (this.newPassword !== this.confirmPassword) {
-        alert("两次输入的密码不一致");
+        this.show("两次输入的密码不一致");
         return;
       }
       const token = localStorage.getItem("token");
       try {
         const response = await axios.post(
-          `http://8.136.125.61/api/Account/changePassword?pswd=${this.newPassword}`,
+          `https://localhost:7086/api/Account/changePassword?pswd=${this.newPassword}`,
           {},
           {
             headers: {
@@ -195,27 +198,32 @@ export default {
         console.log(response);
         if (response.data.success) {
           this.showSuccessMessage = true;
-          alert(response.data.msg);
           setTimeout(() => {
             this.$router.push("/login");
           }, 2000);
         } else {
-          alert(response.data.msg || "密码重置失败，请稍后重试");
+          this.show(response.data.msg || "密码重置失败，请稍后重试");
         }
       } catch (error) {
         if (error.response) {
           // 请求已发出，但服务器响应的状态码不在 2xx 范围内
           if (error.response.status === 401) {
-            alert("用户验证错误");
+            this.show("用户身份验证失败");
           } else {
             console.error("密码重置失败", error);
-            alert("密码重置失败，请稍后再试");
+            this.show("密码重置失败，请稍后再试");
           }
         } else {
           console.error("密码重置失败", error);
-          alert("密码重置失败，请稍后再试");
+          this.show("密码重置失败，请稍后再试");
         }
       }
+    },
+    show(message) {
+      this.showMessage = message;
+      setTimeout(() => {
+        this.showMessage = "";
+      }, 3000);
     },
   },
 };
@@ -351,5 +359,19 @@ label {
   font-size: 12px;
   text-align: center;
   margin-top: 20px;
+}
+
+.message-popup {
+  position: fixed;
+  top: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.6);
+  color: rgb(255, 255, 255);
+  padding: 10px 20px;
+  border-radius: 5px;
+  z-index: 999;
+  opacity: 1;
+  transition: opacity 0.5s ease-in-out;
 }
 </style>

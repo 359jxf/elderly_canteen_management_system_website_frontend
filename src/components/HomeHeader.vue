@@ -60,7 +60,7 @@ export default {
 
       const config = {
         method: "get",
-        url: "http://8.136.125.61/api/account/getPersonInfo",
+        url: "https://localhost:7086/api/account/getPersonInfo",
         headers: {
           Authorization: `Bearer ${token}`, // 在请求头中包含 token
         },
@@ -73,7 +73,7 @@ export default {
             // 更新用户名和头像
             this.username = user.accountName;
             this.avatarPreview = user.portrait
-              ? `http://8.136.125.61${user.portrait}`
+              ? `https://localhost:7086${user.portrait}`
               : this.defaultAvatar;
           } else {
             alert(response.data.msg); // 显示错误信息
@@ -81,7 +81,6 @@ export default {
         })
         .catch((error) => {
           console.error("Error fetching user data:", error);
-          // alert("获取用户数据失败，请稍后再试");
         });
     },
   },
@@ -99,7 +98,7 @@ export default {
   margin-bottom: -1px;
   position: sticky;
   top: 0;
-  z-index: 1000;
+  z-index: 99;
 }
 
 .header-left {

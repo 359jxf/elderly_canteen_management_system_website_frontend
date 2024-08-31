@@ -1,5 +1,8 @@
 <template>
   <div class="container">
+    <transition name="fade">
+      <div v-if="showMessage" class="message-popup">{{ showMessage }}</div>
+    </transition>
     <div class="board"></div>
     <div class="info-wrapper">
       <div class="login-wrapper">
@@ -68,13 +71,22 @@
           <div class="avatar-preview">
             <img :src="avatarPreview || defaultAvatar" alt="头像预览" />
           </div>
-          <div
-            class="btn"
-            @click="isEditing ? updateProfile() : (isEditing = true)"
-          >
-            {{ isEditing ? "确认修改" : "编辑个人信息" }}
+          <!-- 编辑和确认/取消按钮 -->
+          <div v-if="!isEditing && !isLogout">
+            <div class="btn" @click="isEditing = true">编辑个人信息</div>
+            <div class="btn" @click="isLogout = true">退出登录</div>
           </div>
-          <div class="btn" v-if="!isEditing" @click="logout">退出登录</div>
+          <div v-else-if="isEditing">
+            <div class="btn" @click="updateProfile">确认修改</div>
+            <div class="btn" @click="cancelEdit">取消</div>
+          </div>
+          <div v-else>
+            <div class="btn-logout">
+              <div class="btn" @click="logout">退出登录</div>
+              <div class="btn" @click="deleteUser">注销账号</div>
+            </div>
+            <div class="btn" @click="cancelLogout">取消</div>
+          </div>
         </div>
       </div>
     </div>
@@ -103,6 +115,7 @@ export default {
   data() {
     return {
       isEditing: false, // 控制是否处于编辑状态
+      isLogout: false, // 控制是否处于编辑状态
       username: "", // 用户名
       password: "", // 密码
       phone: "", // 手机号
@@ -114,6 +127,7 @@ export default {
         .href, // 默认头像
       isChangePasswordModalVisible: false, // 控制修改密码弹窗显示状态
       isChangePhoneModalVisible: false, // 控制修改手机号弹窗显示状态
+      showMessage: "",
     };
   },
   created() {
@@ -136,7 +150,7 @@ export default {
 
       const config = {
         method: "get",
-        url: "http://8.136.125.61/api/account/getPersonInfo",
+        url: "https://localhost:7086/api/account/getPersonInfo",
         headers: {
           Authorization: `Bearer ${token}`, // 在请求头中包含 token
         },
@@ -153,15 +167,15 @@ export default {
             this.birthdate = user.birthDate;
             // 拼接完整的图片URL
             this.avatarPreview = user.portrait
-              ? `http://8.136.125.61${user.portrait}`
+              ? `https://localhost:7086${user.portrait}`
               : this.defaultAvatar;
           } else {
-            alert(response.data.msg); // 显示错误信息
+            this.show(response.data.msg);
           }
         })
         .catch((error) => {
           console.error("Error fetching user data:", error);
-          alert("获取用户数据失败，请稍后再试");
+          this.show("获取用户数据失败，请稍后再试");
         });
     },
     // 处理头像上传
@@ -189,17 +203,18 @@ export default {
         formData.append("avatar", this.avatar); // 仅在用户选择新头像时才添加
       } else {
         // 将默认头像URL转换为Blob，然后添加到FormData中
-        const response = await fetch(this.defaultAvatar);
-        const blob = await response.blob();
-        const defaultAvatarFile = new File([blob], "defaultAvatar.png", {
-          type: "image/png",
-        });
-        formData.append("avatar", defaultAvatarFile);
+        // const response = await fetch(this.defaultAvatar);
+        // const blob = await response.blob();
+        // const defaultAvatarFile = new File([blob], "defaultAvatar.png", {
+        //   type: "image/png",
+        // });
+        // formData.append("avatar", defaultAvatarFile);
+        formData.append("avatar", null);
       }
 
       const config = {
         method: "post",
-        url: "http://8.136.125.61/api/Account/alterPersonInfo",
+        url: "https://localhost:7086/api/Account/alterPersonInfo",
         headers: {
           Authorization: `Bearer ${token}`, // 在请求头中包含 token
         },
@@ -210,7 +225,7 @@ export default {
         .then((response) => {
           console.log(response.data);
           if (response.data.alterSuccess) {
-            alert("个人信息修改成功！"); // 修改成功提示
+            this.show("个人信息修改成功！");
             // 更新 localStorage 中的用户信息
             const updatedUser = {
               accountName: this.username,
@@ -224,13 +239,46 @@ export default {
             localStorage.setItem("user", JSON.stringify(updatedUser));
             this.isEditing = false; // 退出编辑状态
           } else {
-            alert("修改失败，请稍后重试！"); // 修改失败提示
+            this.show("修改失败，请稍后重试！");
           }
         })
         .catch((error) => {
           console.log(error);
-          alert("个人信息修改失败，请稍后再试");
+          this.show("修改失败，请稍后重试！");
         });
+    },
+    cancelEdit() {
+      this.isEditing = false;
+      this.fetchUserData();
+    },
+    async deleteUser() {
+      const token = localStorage.getItem("token"); // 获取存储的 token
+
+      const config = {
+        method: "delete",
+        url: "https://localhost:7086/api/account/deleteUser",
+        headers: {
+          Authorization: `Bearer ${token}`, // 在请求头中包含 token
+        },
+      };
+
+      axios(config)
+        .then((response) => {
+          if (response.data.success) {
+            this.show(response.data.msg);
+            localStorage.removeItem("token");
+            window.location.href = "/home";
+          } else {
+            this.show(response.data.msg);
+          }
+        })
+        .catch((error) => {
+          console.error("Error deleting user:", error);
+          this.show("注销账号时发生错误，请稍后重试");
+        });
+    },
+    cancelLogout() {
+      this.isLogout = false;
     },
     // 显示修改密码弹窗
     showChangePasswordModal() {
@@ -239,6 +287,12 @@ export default {
     // 显示修改手机号弹窗
     showChangePhoneModal() {
       this.isChangePhoneModalVisible = true;
+    },
+    show(message) {
+      this.showMessage = message;
+      setTimeout(() => {
+        this.showMessage = "";
+      }, 3000);
     },
   },
 };
@@ -296,7 +350,7 @@ export default {
   z-index: 2;
   /* 确保内容位于覆盖层之上 */
   width: 400px;
-  height: 680px;
+  height: 650px;
   /* 增加高度以适应更多字段 */
   padding: 10px 50px;
   font-size: 15px;
@@ -332,7 +386,7 @@ a:hover {
 .input-group {
   display: flex;
   align-items: center;
-
+  height: 20px;
   width: 100%;
   margin: 20px 0;
   position: relative; /* 新增 */
@@ -353,12 +407,14 @@ a:hover {
   font-size: large;
 }
 
-button {
-  margin-left: 10px;
+.btn-logout {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
 }
 
 .btn {
-  width: 40%;
   padding: 10px;
   margin: 10px 0;
   text-align: center;
@@ -427,5 +483,19 @@ button {
   border-radius: 50%;
   /* 圆形头像 */
   object-fit: cover;
+}
+
+.message-popup {
+  position: fixed;
+  top: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.6);
+  color: rgb(255, 255, 255);
+  padding: 10px 20px;
+  border-radius: 5px;
+  z-index: 999;
+  opacity: 1;
+  transition: opacity 0.5s ease-in-out;
 }
 </style>

@@ -1,5 +1,8 @@
 <template>
   <div class="modal">
+    <transition name="fade">
+      <div v-if="showMessage" class="message-popup">{{ showMessage }}</div>
+    </transition>
     <div class="modal-content">
       <div class="modal-header">
         <div class="header">修改密码</div>
@@ -30,19 +33,13 @@
 import axios from "axios";
 export default {
   name: "ChangePasswordModal",
-  props: {
-    phone: {
-      type: String,
-      required: true,
-    },
-  },
   data() {
     return {
       oldPassword: "",
       newPassword: "",
       confirmPassword: "",
       passwordMismatch: false,
-      errorMessage: "",
+      showMessage: "",
     };
   },
   methods: {
@@ -54,43 +51,64 @@ export default {
         query: { from: "change-password", phone: this.phone },
       });
     },
-    changePassword() {
+    async changePassword() {
+      if (!this.oldPassword || !this.newPassword || !this.confirmPassword) {
+        this.showError("请输入原密码、新密码和确认密码");
+        return;
+      }
+
       if (this.newPassword !== this.confirmPassword) {
         this.passwordMismatch = true;
         return;
       }
 
-      // 检查原密码是否正确的逻辑
-      axios
-        .post(
-          "https://apifoxmock.com/m1/4808550-4462943-default/api/checkPassword",
+      const token = localStorage.getItem("token");
+      try {
+        const response = await axios.post(
+          `https://localhost:7086/api/Account/alterPassword`,
           {
             oldPassword: this.oldPassword,
+            newPassword: this.newPassword,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
           }
-        )
-        .then((response) => {
-          if (response.data.success) {
-            // 更新密码的逻辑
-            axios
-              .post("http://8.136.125.61/changePassword", {
-                newPassword: this.newPassword,
-              })
-              .then((response) => {
-                if (response.data.success) {
-                  this.$emit("close");
-                  alert("密码修改成功");
-                } else {
-                  this.errorMessage = response.data.message;
-                }
-              });
-          } else {
-            this.errorMessage = "原密码不正确";
+        );
+
+        if (response.data.success) {
+          // this.$emit("close");
+          this.showSuccess(response.data.msg);
+        } else {
+          this.showError(response.data.msg);
+        }
+      } catch (error) {
+        if (error.response) {
+          // 请求已发出，但服务器响应的状态码不在 2xx 范围内
+          if (error.response.status === 400) {
+            this.showError("原密码不正确");
           }
-        })
-        .catch((error) => {
-          console.log(error);
-          this.errorMessage = "修改密码失败，请稍后再试";
-        });
+        } else {
+          // 一些其他的错误
+          console.error("密码修改失败", error);
+          this.showError("密码修改失败，请稍后再试");
+        }
+      }
+    },
+    showError(message) {
+      this.showMessage = message;
+      setTimeout(() => {
+        this.showMessage = "";
+      }, 3000); // 错误信息3秒后消失
+    },
+    showSuccess(message) {
+      this.showMessage = message;
+      setTimeout(() => {
+        this.showMessage = "";
+        this.$emit("close");
+      }, 2000);
     },
   },
 };
@@ -107,7 +125,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 900;
 }
 
 .modal-content {
@@ -138,7 +156,7 @@ export default {
   margin-bottom: -1px;
   position: sticky;
   top: 0;
-  z-index: 1000;
+  z-index: 900;
 }
 
 .close {
@@ -199,5 +217,19 @@ a {
 
 a:hover {
   color: rgb(175, 196, 35); /* 可选：鼠标悬停时颜色变为深蓝色 */
+}
+
+.message-popup {
+  position: fixed;
+  top: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.6);
+  color: rgb(255, 255, 255);
+  padding: 10px 20px;
+  border-radius: 5px;
+  z-index: 999;
+  opacity: 1;
+  transition: opacity 0.5s ease-in-out;
 }
 </style>

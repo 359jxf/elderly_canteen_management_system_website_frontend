@@ -1,5 +1,8 @@
 <template>
   <div class="container">
+    <transition name="fade">
+      <div v-if="showMessage" class="message-popup">{{ showMessage }}</div>
+    </transition>
     <div class="login-register-wrapper">
       <div class="login-section">
         <div class="header">用户登录</div>
@@ -42,6 +45,8 @@ export default {
     return {
       phonenumber: "",
       password: "",
+
+      showMessage: "",
     };
   },
   methods: {
@@ -55,22 +60,24 @@ export default {
     },
     async login() {
       if (this.phonenumber.length !== 11) {
-        alert("手机号必须为11位数字");
+        this.show("手机号必须为11位数字");
         return;
       }
       if (!this.phonenumber || !this.password) {
-        alert("手机号和密码不能为空！");
+        this.show("手机号和密码不能为空！");
         return;
       }
       try {
-        const res = await axios.post("http://8.136.125.61/api/account/login", {
-          phoneNum: this.phonenumber,
-          password: this.password,
-        });
+        const res = await axios.post(
+          "https://localhost:7086/api/account/login",
+          {
+            phoneNum: this.phonenumber,
+            password: this.password,
+          }
+        );
         console.log(res.data.response);
         if (res.data.loginSuccess) {
           console.log("Login successful");
-          console.log("Token:", res.data.response.token);
           console.log("Role:", res.data.response.identity);
           console.log("Username:", res.data.response.accountName);
 
@@ -80,24 +87,30 @@ export default {
           this.$router.push("/home");
         } else {
           console.log("Login not successful");
-          alert(res.data.msg);
+          this.show(res.data.msg);
         }
       } catch (error) {
         console.log("Login error");
         if (error.response) {
           // 请求已发出，但服务器响应的状态码不在 2xx 范围内
           if (error.response.status === 404) {
-            alert("记录不存在");
+            this.show("用户不存在");
           } else if (error.response.status === 400) {
-            alert("密码不正确");
+            this.show("密码不正确");
           } else {
-            alert("登录失败");
+            this.show("登录失败");
           }
         } else {
           // 一些其他的错误
-          alert("登录失败");
+          this.show("登录失败");
         }
       }
+    },
+    show(message) {
+      this.showMessage = message;
+      setTimeout(() => {
+        this.showMessage = "";
+      }, 3000);
     },
   },
 };
@@ -225,5 +238,19 @@ a:hover {
   margin-left: 10px;
   color: #d6d5d5;
   font-size: 12px;
+}
+
+.message-popup {
+  position: fixed;
+  top: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.6);
+  color: rgb(255, 255, 255);
+  padding: 10px 20px;
+  border-radius: 5px;
+  z-index: 999;
+  opacity: 1;
+  transition: opacity 0.5s ease-in-out;
 }
 </style>

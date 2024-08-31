@@ -5,7 +5,7 @@
         <img src="@/assets/poster.png" alt="Card Image" class="card-image" />
       </div>
       <div class="login-wrapper">
-        <div class="msg"><a href="/">《 返回登录</a></div>
+        <div class="msg"><a href="/login">《 返回登录</a></div>
         <div class="header">用户注册</div>
         <div class="form-wrapper">
           <div class="input-group">
@@ -42,9 +42,10 @@
             <p><span class="required">*</span>手机号</p>
             <input
               type="text"
-              v-model="phone"
+              v-model="phonenumber"
               placeholder="常用手机号"
               class="input-item"
+              @input="validatePhoneNumber"
             />
             <button
               :class="{
@@ -61,7 +62,7 @@
             <p><span class="required">*</span>验证码</p>
             <input
               type="text"
-              v-model="verificationCode"
+              v-model="otp"
               placeholder="验证码"
               maxlength="6"
               class="input-item"
@@ -96,7 +97,7 @@
       </div>
     </div>
     <transition name="fade">
-      <div v-if="errorMessage" class="error-popup">{{ errorMessage }}</div>
+      <div v-if="showMessage" class="message-popup">{{ showMessage }}</div>
     </transition>
   </div>
 </template>
@@ -114,17 +115,25 @@ export default {
       username: "",
       password: "",
       confirmPassword: "",
-      phone: "",
-      verificationCode: "",
+      phonenumber: "",
+      otp: "",
       gender: "",
       birthdate: "",
       avatar: null,
       avatarPreview: null,
       defaultAvatar: require("@/assets/defaultportrait.png"),
-      errorMessage: "",
+      showMessage: "",
     };
   },
   methods: {
+    validatePhoneNumber() {
+      // 只保留数字
+      this.phonenumber = this.phonenumber.replace(/\D/g, "");
+      // 限制最大长度为11位
+      if (this.phonenumber.length > 11) {
+        this.phonenumber = this.phonenumber.slice(0, 11);
+      }
+    },
     handleAvatarUpload(event) {
       const file = event.target.files[0];
       if (file) {
@@ -141,8 +150,8 @@ export default {
         !this.username ||
         !this.password ||
         !this.confirmPassword ||
-        !this.phone ||
-        !this.verificationCode ||
+        !this.phonenumber ||
+        !this.otp ||
         !this.gender
       ) {
         this.showError("请填写所有必填项");
@@ -158,8 +167,8 @@ export default {
       const formData = new FormData();
       formData.append("userName", this.username);
       formData.append("password", this.password);
-      formData.append("phone", this.phone);
-      formData.append("verificationCode", this.verificationCode || "");
+      formData.append("phone", this.phonenumber);
+      formData.append("verificationCode", this.otp);
       formData.append("gender", this.gender);
       formData.append("birthDate", this.birthdate || ""); // 如果生日为空，则传递空字符串
 
@@ -192,7 +201,7 @@ export default {
     sendRegisterRequest(formData) {
       const config = {
         method: "post",
-        url: "http://8.136.125.61/api/account/register",
+        url: "https://localhost:7086/api/account/register",
         data: formData,
       };
 
@@ -213,20 +222,39 @@ export default {
         });
     },
 
-    sendOTP() {
-      // 发送验证码逻辑
-      this.isButtonDisabled = true;
-      this.buttonText = `成功发送，${this.countdown}s后重新发送`;
+    async sendOTP() {
+      if (this.phonenumber.length !== 11) {
+        this.showError("手机号必须为11位数字");
+        return;
+      }
 
-      const countdownInterval = setInterval(() => {
-        if (this.countdown > 1) {
-          this.countdown--;
-          this.buttonText = `成功发送，${this.countdown}s后重新发送`;
+      try {
+        const response = await axios.post(
+          "https://localhost:7086/api/Account/sendOTP",
+          {
+            PhoneNum: this.phonenumber,
+          }
+        );
+        console.log(response);
+        if (response.data.success) {
+          this.isButtonDisabled = true;
+          this.buttonText = `${this.countdown}s后重新发送`;
+
+          const countdownInterval = setInterval(() => {
+            if (this.countdown > 1) {
+              this.countdown--;
+              this.buttonText = `${this.countdown}s后重新发送`;
+            } else {
+              clearInterval(countdownInterval);
+              this.resetButton();
+            }
+          }, 1000);
         } else {
-          clearInterval(countdownInterval);
-          this.resetButton();
+          this.showError(response.data.msg);
         }
-      }, 1000);
+      } catch (error) {
+        this.showError("发送验证码失败");
+      }
     },
     resetButton() {
       this.buttonText = "发送验证码";
@@ -234,17 +262,17 @@ export default {
       this.countdown = 60;
     },
     showError(message) {
-      this.errorMessage = message;
+      this.showMessage = message;
       setTimeout(() => {
-        this.errorMessage = "";
+        this.showMessage = "";
       }, 3000); // 错误信息3秒后消失
     },
     showSuccess(message) {
-      this.errorMessage = message;
+      this.showMessage = message;
       setTimeout(() => {
-        this.errorMessage = "";
-        this.$router.push("/home"); // 跳转到首页或其他页面
-      }, 2000); // 成功信息2秒后消失并跳转页面
+        this.showMessage = "";
+        this.$router.push("/home");
+      }, 2000);
     },
 
     handleMouseMove(event) {
@@ -388,9 +416,9 @@ button {
   background-color: #ff8e24;
 }
 
-.error-popup {
+.message-popup {
   position: fixed;
-  bottom: 50px;
+  top: 50px;
   left: 50%;
   transform: translateX(-50%);
   background-color: rgba(0, 0, 0, 0.6);

@@ -1,5 +1,8 @@
 <template>
   <div class="container">
+    <transition name="fade">
+      <div v-if="showMessage" class="message-popup">{{ showMessage }}</div>
+    </transition>
     <div class="login-register-wrapper">
       <div class="login-section">
         <div class="header">用户登录</div>
@@ -54,6 +57,7 @@ export default {
       buttonText: "发送验证码",
       isButtonDisabled: false,
       countdown: 60,
+      showMessage: "",
     };
   },
   methods: {
@@ -67,13 +71,13 @@ export default {
     },
     async sendOTP() {
       if (this.phonenumber.length !== 11) {
-        alert("手机号必须为11位数字");
+        this.show("手机号必须为11位数字");
         return;
       }
 
       try {
         const response = await axios.post(
-          "http://8.136.125.61/api/Account/sendOTP",
+          "https://localhost:7086/api/Account/sendOTP",
           {
             PhoneNum: this.phonenumber,
           }
@@ -93,25 +97,25 @@ export default {
             }
           }, 1000);
         } else {
-          alert(response.data.msg);
+          this.show(response.data.msg);
         }
       } catch (error) {
-        alert("发送验证码失败");
+        this.show("发送验证码失败");
       }
     },
     async login() {
       if (this.phonenumber.length !== 11) {
-        alert("手机号必须为11位数字");
+        this.show("手机号必须为11位数字");
         return;
       }
       if (!this.otp) {
-        alert("验证码不能为空！");
+        this.show("验证码不能为空！");
       }
       console.log(this.phonenumber);
       console.log(this.otp);
       try {
         const response = await axios.post(
-          "http://8.136.125.61/api/Account/verifiationCodeLogin",
+          "https://localhost:7086/api/Account/verifiationCodeLogin",
           {
             PhoneNum: this.phonenumber,
             Code: this.otp,
@@ -124,23 +128,29 @@ export default {
           // 跳转到 /home 页面
           this.$router.push("/home");
         } else {
-          alert(response.data.msg);
+          this.show(response.data.msg);
         }
       } catch (error) {
         if (error.response) {
           // 请求已发出，但服务器响应的状态码不在 2xx 范围内
           if (error.response.status === 404) {
-            alert("记录不存在");
+            this.show("用户不存在");
           } else if (error.response.status === 400) {
-            alert("验证码不正确");
+            this.show("验证码不正确");
           } else {
-            alert("登录失败");
+            this.show("登录失败");
           }
         } else {
           // 一些其他的错误
-          alert("登录失败");
+          this.show("登录失败");
         }
       }
+    },
+    show(message) {
+      this.showMessage = message;
+      setTimeout(() => {
+        this.showMessage = "";
+      }, 3000);
     },
     resetButton() {
       this.buttonText = "发送验证码";
@@ -287,5 +297,19 @@ button {
 .disabledButton {
   background-color: rgba(72, 45, 8, 0.5);
   cursor: not-allowed;
+}
+
+.message-popup {
+  position: fixed;
+  top: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.6);
+  color: rgb(255, 255, 255);
+  padding: 10px 20px;
+  border-radius: 5px;
+  z-index: 999;
+  opacity: 1;
+  transition: opacity 0.5s ease-in-out;
 }
 </style>
