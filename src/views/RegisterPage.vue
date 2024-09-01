@@ -27,6 +27,7 @@
               maxlength="16"
               minlength="6"
               class="input-item"
+              @input="validatePasswordLength"
             />
           </div>
           <div class="input-group">
@@ -146,6 +147,13 @@ export default {
         this.phonenumber = this.phonenumber.slice(0, 11);
       }
     },
+    validatePasswordLength() {
+      if (this.newPassword.length > 16) {
+        // 如果密码长度超过16个字符，截取前16个字符并显示提示信息
+        this.newPassword = this.newPassword.slice(0, 16);
+        this.showError("密码超出最长限制,最多16个字符");
+      }
+    },
     handleAvatarUpload(event) {
       const file = event.target.files[0];
       if (file) {
@@ -262,7 +270,7 @@ export default {
             }
           }, 1000);
         } else {
-          alert(response.data.msg);
+          this.showError(response.data.msg);
         }
       } catch (error) {
         this.showError("发送验证码失败");

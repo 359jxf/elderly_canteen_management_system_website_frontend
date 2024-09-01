@@ -137,7 +137,7 @@ export default {
         const token = localStorage.getItem("token");
         const config = {
           method: "get",
-          url: "https://localhost:7086/api/account/getPersonInfo",
+          url: "http://8.136.125.61/api/account/getPersonInfo",
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -291,7 +291,7 @@ export default {
 
     fetchDonations() {
       axios
-        .get("https://localhost:7086/api/Donate/getDonationList")
+        .get("http://8.136.125.61/api/Donate/getDonationList")
         .then((res) => {
           console.log(res.data); // 检查完整的返回数据
           if (res.data && Array.isArray(res.data.responce)) {

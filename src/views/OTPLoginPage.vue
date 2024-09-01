@@ -78,7 +78,7 @@ export default {
 
       try {
         const response = await axios.post(
-          "https://localhost:7086/api/Account/sendOTP",
+          "http://8.136.125.61/api/Account/sendOTP",
           {
             PhoneNum: this.phonenumber,
           }
@@ -116,7 +116,7 @@ export default {
       console.log(this.otp);
       try {
         const response = await axios.post(
-          "https://localhost:7086/api/Account/verifiationCodeLogin",
+          "http://8.136.125.61/api/Account/verifiationCodeLogin",
           {
             PhoneNum: this.phonenumber,
             Code: this.otp,

@@ -69,13 +69,10 @@ export default {
         return;
       }
       try {
-        const res = await axios.post(
-          "https://localhost:7086/api/account/login",
-          {
-            phoneNum: this.phonenumber,
-            password: this.password,
-          }
-        );
+        const res = await axios.post("http://8.136.125.61/api/account/login", {
+          phoneNum: this.phonenumber,
+          password: this.password,
+        });
         console.log(res.data.response);
         if (res.data.loginSuccess) {
           console.log("Login successful");

@@ -1,5 +1,8 @@
 <!-- components/DonationSection.vue -->
 <template>
+  <transition name="fade">
+    <div v-if="showMessage" class="message-popup">{{ showMessage }}</div>
+  </transition>
   <section>
     <!-- 锚点，用于使导航栏跳转到本区域上方50px的位置，不然顶部导航栏会遮住部分内容 -->
     <a

@@ -16,12 +16,16 @@
         </div>
         <div class="input-group">
           <p>新密码：</p>
-          <input type="password" v-model="newPassword" />
+          <input
+            type="password"
+            v-model="newPassword"
+            @input="validatePasswordLength"
+            placeholder="最大16个字符"
+          />
         </div>
         <div class="input-group">
           <p>确认密码：</p>
           <input type="password" v-model="confirmPassword" />
-          <div v-if="passwordMismatch" class="error">两次输入不一致</div>
         </div>
         <div class="btn" @click="changePassword">确认修改</div>
       </div>
@@ -38,7 +42,6 @@ export default {
       oldPassword: "",
       newPassword: "",
       confirmPassword: "",
-      passwordMismatch: false,
       showMessage: "",
     };
   },
@@ -58,14 +61,14 @@ export default {
       }
 
       if (this.newPassword !== this.confirmPassword) {
-        this.passwordMismatch = true;
+        this.showError("新密码和确认密码不一致");
         return;
       }
 
       const token = localStorage.getItem("token");
       try {
         const response = await axios.post(
-          `https://localhost:7086/api/Account/alterPassword`,
+          `http://8.136.125.61/api/Account/alterPassword`,
           {
             oldPassword: this.oldPassword,
             newPassword: this.newPassword,
@@ -109,6 +112,13 @@ export default {
         this.showMessage = "";
         this.$emit("close");
       }, 2000);
+    },
+    validatePasswordLength() {
+      if (this.newPassword.length > 16) {
+        // 如果密码长度超过16个字符，截取前16个字符并显示提示信息
+        this.newPassword = this.newPassword.slice(0, 16);
+        this.showError("密码超出最长限制,最多16个字符");
+      }
     },
   },
 };

@@ -152,7 +152,7 @@ export default {
 
       const config = {
         method: "get",
-        url: "https://localhost:7086/api/account/getPersonInfo",
+        url: "http://8.136.125.61/api/account/getPersonInfo",
         headers: {
           Authorization: `Bearer ${token}`, // 在请求头中包含 token
         },
@@ -169,7 +169,7 @@ export default {
             this.birthdate = user.birthDate;
             // 拼接完整的图片URL
             this.avatarPreview = user.portrait
-              ? `https://localhost:7086${user.portrait}`
+              ? `http://8.136.125.61${user.portrait}`
               : this.defaultAvatar;
           } else {
             this.show(response.data.msg);
@@ -216,7 +216,7 @@ export default {
 
       const config = {
         method: "post",
-        url: "https://localhost:7086/api/Account/alterPersonInfo",
+        url: "http://8.136.125.61/api/Account/alterPersonInfo",
         headers: {
           Authorization: `Bearer ${token}`, // 在请求头中包含 token
         },
@@ -258,7 +258,7 @@ export default {
 
       const config = {
         method: "delete",
-        url: "https://localhost:7086/api/account/deleteUser",
+        url: "http://8.136.125.61/api/account/deleteUser",
         headers: {
           Authorization: `Bearer ${token}`, // 在请求头中包含 token
         },
