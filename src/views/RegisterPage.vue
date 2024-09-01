@@ -213,7 +213,7 @@ export default {
     sendRegisterRequest(formData) {
       const config = {
         method: "post",
-        url: "https://localhost:7086/api/account/register",
+        url: "https://8.136.125.61/api/account/register",
         data: formData,
       };
 
@@ -242,7 +242,7 @@ export default {
 
       try {
         const response = await axios.post(
-          "https://localhost:7086/api/Account/sendOTP",
+          "https://8.136.125.61/api/Account/sendOTP",
           {
             PhoneNum: this.phonenumber,
           }
@@ -262,7 +262,7 @@ export default {
             }
           }, 1000);
         } else {
-          this.showError(response.data.msg);
+          alert(response.data.msg);
         }
       } catch (error) {
         this.showError("发送验证码失败");
