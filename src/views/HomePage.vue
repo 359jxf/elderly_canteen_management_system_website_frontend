@@ -254,7 +254,6 @@ export default {
           "http://127.0.0.1:4523/m1/4808550-4462943-default/getWeekmenuAndWeekDiscount"
         );
         const menuItems = response.data.response;
-        console.log(menuItems);
         this.dishOnSale = menuItems.filter(
           (item) =>
             "disPrice" in item &&

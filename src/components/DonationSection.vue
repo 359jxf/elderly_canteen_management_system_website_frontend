@@ -164,7 +164,7 @@ export default {
         return;
       }
 
-      const donationAPI = "https://8.136.125.61/api/Donate/submitDonation";
+      const donationAPI = "http://8.136.125.61/api/Donate/submitDonation";
       const donationData = {
         accountId: this.user.id,
         price: this.donationAmount,

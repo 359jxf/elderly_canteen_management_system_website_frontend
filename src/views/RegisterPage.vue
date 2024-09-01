@@ -23,7 +23,7 @@
             <input
               type="password"
               v-model="password"
-              placeholder="密码(6-16个字符组成,区分大小写)"
+              placeholder="密码(最多16个字符组成,区分大小写)"
               maxlength="16"
               minlength="6"
               class="input-item"
@@ -221,7 +221,7 @@ export default {
     sendRegisterRequest(formData) {
       const config = {
         method: "post",
-        url: "https://8.136.125.61/api/account/register",
+        url: "http://8.136.125.61/api/account/register",
         data: formData,
       };
 
@@ -250,7 +250,7 @@ export default {
 
       try {
         const response = await axios.post(
-          "https://8.136.125.61/api/Account/sendOTP",
+          "http://8.136.125.61/api/Account/sendOTP",
           {
             PhoneNum: this.phonenumber,
           }
