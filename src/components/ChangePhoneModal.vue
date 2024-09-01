@@ -70,7 +70,7 @@ export default {
 
       try {
         const response = await axios.post(
-          "https://localhost:7086/api/Account/sendOTP",
+          "http://8.136.125.61/api/Account/sendOTP",
           {
             PhoneNum: this.phonenumber,
           }
@@ -124,7 +124,7 @@ export default {
     async verifyOtp() {
       try {
         const response = await axios.post(
-          "https://localhost:7086/api/Account/verifiationCodeWithoutUserCheck",
+          "http://8.136.125.61/api/Account/verifiationCodeWithoutUserCheck",
           {
             PhoneNum: this.phonenumber,
             Code: this.otp,
@@ -156,7 +156,7 @@ export default {
           Authorization: `Bearer ${token}`,
         };
         const response = await axios.post(
-          "https://localhost:7086/api/Account/changePhone",
+          "http://8.136.125.61/api/Account/changePhone",
           {
             NewPhoneNum: this.phonenumber,
           },

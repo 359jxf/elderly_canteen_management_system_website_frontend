@@ -23,10 +23,11 @@
             <input
               type="password"
               v-model="password"
-              placeholder="密码(6-16个字符组成,区分大小写)"
+              placeholder="密码(最多16个字符组成,区分大小写)"
               maxlength="16"
               minlength="6"
               class="input-item"
+              @input="validatePasswordLength"
             />
           </div>
           <div class="input-group">
@@ -134,6 +135,13 @@ export default {
         this.phonenumber = this.phonenumber.slice(0, 11);
       }
     },
+    validatePasswordLength() {
+      if (this.newPassword.length > 16) {
+        // 如果密码长度超过16个字符，截取前16个字符并显示提示信息
+        this.newPassword = this.newPassword.slice(0, 16);
+        this.showError("密码超出最长限制,最多16个字符");
+      }
+    },
     handleAvatarUpload(event) {
       const file = event.target.files[0];
       if (file) {
@@ -201,7 +209,7 @@ export default {
     sendRegisterRequest(formData) {
       const config = {
         method: "post",
-        url: "https://localhost:7086/api/account/register",
+        url: "http://8.136.125.61/api/account/register",
         data: formData,
       };
 
@@ -230,7 +238,7 @@ export default {
 
       try {
         const response = await axios.post(
-          "https://localhost:7086/api/Account/sendOTP",
+          "http://8.136.125.61/api/Account/sendOTP",
           {
             PhoneNum: this.phonenumber,
           }

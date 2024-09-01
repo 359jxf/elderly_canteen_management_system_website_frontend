@@ -42,7 +42,8 @@
           type="password"
           v-model="newPassword"
           id="newPassword"
-          placeholder="新的密码"
+          @input="validatePasswordLength"
+          placeholder="密码最大16个字符"
         />
 
         <label for="confirmPassword">确认密码:</label>
@@ -90,6 +91,13 @@ export default {
         this.phonenumber = this.phonenumber.slice(0, 11);
       }
     },
+    validatePasswordLength() {
+      if (this.newPassword.length > 16) {
+        // 如果密码长度超过16个字符，截取前16个字符并显示提示信息
+        this.newPassword = this.newPassword.slice(0, 16);
+        this.show("密码超出最长限制,最多16个字符");
+      }
+    },
     async sendOTP() {
       if (this.phonenumber.length !== 11) {
         this.show("手机号必须为11位数字");
@@ -98,7 +106,7 @@ export default {
 
       try {
         const response = await axios.post(
-          "https://localhost:7086/api/Account/sendOTP",
+          "http://8.136.125.61/api/Account/sendOTP",
           {
             PhoneNum: this.phonenumber,
           }
@@ -142,7 +150,7 @@ export default {
       console.log(this.otp);
       try {
         const response = await axios.post(
-          "https://localhost:7086/api/Account/verifiationCodeLogin",
+          "http://8.136.125.61/api/Account/verifiationCodeLogin",
           {
             PhoneNum: this.phonenumber,
             Code: this.otp,
@@ -186,7 +194,7 @@ export default {
       const token = localStorage.getItem("token");
       try {
         const response = await axios.post(
-          `https://localhost:7086/api/Account/changePassword?pswd=${this.newPassword}`,
+          `http://8.136.125.61/api/Account/changePassword?pswd=${this.newPassword}`,
           {},
           {
             headers: {
