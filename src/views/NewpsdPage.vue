@@ -42,6 +42,7 @@
           type="password"
           v-model="newPassword"
           id="newPassword"
+          @input="validatePasswordLength"
           placeholder="密码最大16个字符"
         />
 
@@ -88,6 +89,13 @@ export default {
       // 限制最大长度为11位
       if (this.phonenumber.length > 11) {
         this.phonenumber = this.phonenumber.slice(0, 11);
+      }
+    },
+    validatePasswordLength() {
+      if (this.newPassword.length > 16) {
+        // 如果密码长度超过16个字符，截取前16个字符并显示提示信息
+        this.newPassword = this.newPassword.slice(0, 16);
+        this.show("密码超出最长限制,最多16个字符");
       }
     },
     async sendOTP() {
