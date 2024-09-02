@@ -60,7 +60,7 @@ export default {
 
       const config = {
         method: "get",
-        url: "https://localhost:7086/api/account/getPersonInfo",
+        url: "http://8.136.125.61/api/account/getPersonInfo",
         headers: {
           Authorization: `Bearer ${token}`, // 在请求头中包含 token
         },
@@ -73,7 +73,7 @@ export default {
             // 更新用户名和头像
             this.username = user.accountName;
             this.avatarPreview = user.portrait
-              ? `https://localhost:7086${user.portrait}`
+              ? `http://8.136.125.61${user.portrait}`
               : this.defaultAvatar;
           } else {
             alert(response.data.msg); // 显示错误信息

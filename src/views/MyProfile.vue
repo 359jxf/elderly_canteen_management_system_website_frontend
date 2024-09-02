@@ -74,15 +74,15 @@
             <img :src="avatarPreview || defaultAvatar" alt="头像预览" />
           </div>
           <!-- 编辑和确认/取消按钮 -->
-          <div v-if="!isEditing && !isLogout">
+          <div class="btn-group" v-if="!isEditing && !isLogout">
             <div class="btn" @click="isEditing = true">编辑个人信息</div>
             <div class="btn" @click="isLogout = true">退出登录</div>
           </div>
-          <div v-else-if="isEditing">
+          <div class="btn-group" v-else-if="isEditing">
             <div class="btn" @click="updateProfile">确认修改</div>
             <div class="btn" @click="cancelEdit">取消</div>
           </div>
-          <div v-else>
+          <div class="btn-group" v-else>
             <div class="btn-logout">
               <div class="btn" @click="logout">退出登录</div>
               <div class="btn" @click="deleteUser">注销账号</div>
@@ -152,7 +152,7 @@ export default {
 
       const config = {
         method: "get",
-        url: "https://localhost:7086/api/account/getPersonInfo",
+        url: "http://8.136.125.61/api/account/getPersonInfo",
         headers: {
           Authorization: `Bearer ${token}`, // 在请求头中包含 token
         },
@@ -169,7 +169,7 @@ export default {
             this.birthdate = user.birthDate;
             // 拼接完整的图片URL
             this.avatarPreview = user.portrait
-              ? `https://localhost:7086${user.portrait}`
+              ? `http://8.136.125.61${user.portrait}`
               : this.defaultAvatar;
           } else {
             this.show(response.data.msg);
@@ -216,7 +216,7 @@ export default {
 
       const config = {
         method: "post",
-        url: "https://localhost:7086/api/Account/alterPersonInfo",
+        url: "http://8.136.125.61/api/Account/alterPersonInfo",
         headers: {
           Authorization: `Bearer ${token}`, // 在请求头中包含 token
         },
@@ -258,7 +258,7 @@ export default {
 
       const config = {
         method: "delete",
-        url: "https://localhost:7086/api/account/deleteUser",
+        url: "http://8.136.125.61/api/account/deleteUser",
         headers: {
           Authorization: `Bearer ${token}`, // 在请求头中包含 token
         },
@@ -506,4 +506,5 @@ a:hover {
   opacity: 1;
   transition: opacity 0.5s ease-in-out;
 }
+
 </style>

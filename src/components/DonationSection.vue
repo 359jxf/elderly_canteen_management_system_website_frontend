@@ -7,6 +7,9 @@
       style="display: block; height: 50px; margin-top: -50px"
     ></a>
     <div class="donation">
+      <transition name="fade">
+        <div v-if="showMessage" class="message-popup">{{ showMessage }}</div>
+      </transition>
       <div class="donation-info">
         <div class="donation-intro">
           随着社会老龄化进程的加快，越来越多的长者面临着生活照料和精神关怀的需求。长者食堂旨在为社区内的老年人提供一个温馨舒适的用餐环境，不仅解决了他们日常饮食的难题，还为他们搭建了一个交流互动的平台。
@@ -161,7 +164,7 @@ export default {
         return;
       }
 
-      const donationAPI = "https://8.136.125.61/api/Donate/submitDonation";
+      const donationAPI = "http://8.136.125.61/api/Donate/submitDonation";
       const donationData = {
         accountId: this.user.id,
         price: this.donationAmount,

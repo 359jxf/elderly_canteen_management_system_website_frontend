@@ -65,7 +65,7 @@ export default {
       const token = localStorage.getItem("token");
       try {
         const response = await axios.post(
-          `https://localhost:7086/api/Account/alterPassword`,
+          `http://8.136.125.61/api/Account/alterPassword`,
           {
             oldPassword: this.oldPassword,
             newPassword: this.newPassword,

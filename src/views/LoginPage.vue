@@ -70,7 +70,7 @@ export default {
       }
       try {
         const res = await axios.post(
-          "https://localhost:7086/api/account/login",
+          "http://8.136.125.61/api/account/login",
           {
             phoneNum: this.phonenumber,
             password: this.password,
