@@ -79,11 +79,12 @@ export default {
         console.log(res.data.response);
         if (res.data.loginSuccess) {
           console.log("Login successful");
-          console.log("Role:", res.data.response.identity);
+          console.log("Identity:", res.data.response.identity);
           console.log("Username:", res.data.response.accountName);
 
           // 将 Token 存储在 localStorage
           localStorage.setItem("token", res.data.response.token);
+          localStorage.setItem("identity", res.data.response.identity);
           // 跳转到 /home 页面
           this.$router.push("/home");
         } else {

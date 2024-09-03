@@ -222,6 +222,7 @@ export default {
           if (response.data.msg === "注册成功") {
             // 将 Token 存储在 localStorage
             localStorage.setItem("token", response.data.response.token);
+            localStorage.setItem("identity", response.data.response.identity);
             console.log(response.data.response);
             this.showSuccess("注册成功！");
           } else {

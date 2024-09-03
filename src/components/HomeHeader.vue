@@ -1,5 +1,8 @@
 <!-- components/Header.vue -->
 <template>
+  <transition name="fade">
+      <div v-if="showMessage" class="message-popup">{{ showMessage }}</div>
+    </transition>
   <div class="header">
     <div class="header-left">
       <span class="canteen-name">老人食堂</span>
@@ -43,17 +46,29 @@ export default {
       username: "",
       avatarPreview: this.defaultAvatar, // 默认头像
       defaultAvatar: require("@/assets/defaultportrait.png"), // 默认头像路径
+      showMessage: "",
     };
   },
   created() {
     this.fetchUserData();
   },
   methods: {
+    sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    },
     goToLogin() {
       this.$router.push("/login");
     },
-    goToProfile() {
-      this.$router.push("/profile");
+    async goToProfile() {
+      const role = localStorage.getItem("identity");
+      if(role=='admin'){
+        this.show("管理员身份认证成功！正在跳转...");
+        await this.sleep(2000);
+        this.$router.push("/profile");//管理员页
+      }
+      else{
+        this.$router.push("/profile");
+      }
     },
     fetchUserData() {
       const token = localStorage.getItem("token"); // 获取存储的 token
@@ -73,7 +88,7 @@ export default {
             // 更新用户名和头像
             this.username = user.accountName;
             this.avatarPreview = user.portrait
-              ? `http://8.136.125.61${user.portrait}`
+              ? `${user.portrait}`
               : this.defaultAvatar;
           } else {
             alert(response.data.msg); // 显示错误信息
@@ -82,6 +97,12 @@ export default {
         .catch((error) => {
           console.error("Error fetching user data:", error);
         });
+    },
+    show(message) {
+      this.showMessage = message;
+      setTimeout(() => {
+        this.showMessage = "";
+      }, 3000);
     },
   },
 };
@@ -160,5 +181,19 @@ nav ul li a:hover {
 
 .login-button:hover {
   background-color: #369d6e;
+}
+
+.message-popup {
+  position: fixed;
+  top: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.6);
+  color: rgb(255, 255, 255);
+  padding: 10px 20px;
+  border-radius: 5px;
+  z-index: 999;
+  opacity: 1;
+  transition: opacity 0.5s ease-in-out;
 }
 </style>

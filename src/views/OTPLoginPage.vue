@@ -126,6 +126,7 @@ export default {
         if (response.data.success) {
           // 将 Token 存储在 localStorage
           localStorage.setItem("token", response.data.response.token);
+          localStorage.setItem("identity", response.data.response.identity);
           // 跳转到 /home 页面
           this.$router.push("/home");
         } else {

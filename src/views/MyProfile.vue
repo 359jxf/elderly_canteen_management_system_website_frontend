@@ -169,7 +169,7 @@ export default {
             this.birthdate = user.birthDate;
             // 拼接完整的图片URL
             this.avatarPreview = user.portrait
-              ? `http://8.136.125.61${user.portrait}`
+              ? `${user.portrait}`
               : this.defaultAvatar;
           } else {
             this.show(response.data.msg);

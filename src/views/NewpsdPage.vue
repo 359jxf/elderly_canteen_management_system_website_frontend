@@ -152,6 +152,7 @@ export default {
         if (response.data.success) {
           // 将 Token 存储在 localStorage
           localStorage.setItem("token", response.data.response.token);
+          localStorage.setItem("identity", response.data.response.identity);
           this.show("验证成功");
           this.step = 2;
         } else {
