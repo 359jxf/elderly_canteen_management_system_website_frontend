@@ -57,6 +57,11 @@ export default {
   overflow: hidden; /* 防止图片超出容器 */
   border-radius: 50%;
 }
+.dishImg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 .dishName {
   font-size: 14px;
   font-weight: bolder;

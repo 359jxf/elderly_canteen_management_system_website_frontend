@@ -1,7 +1,9 @@
 <!-- components/Carousel.vue -->
 <template>
   <div class="main-section">
-    <div class="buttons" @click="prevSlide">←</div>
+    <div class="buttons" @click="prevSlide">
+      <img id="slideLeftArrow" src="../assets/left-arrow.png" alt="arrow">
+    </div>
 
     <div class="intro">
       <div class="text-carousel">
@@ -34,7 +36,9 @@
         />
       </div>
     </div>
-    <div class="buttons" @click="nextSlide">→</div>
+    <div class="buttons" @click="nextSlide">
+      <img id="slideRightArrow" src="../assets/right-arrow.png" alt="arrow">
+    </div>
   </div>
 </template>
 
@@ -49,6 +53,10 @@ export default {
     return {
       currentIndex: 0,
       timer: null,
+      leftArrow: require('@/assets/left-arrow.png'),  
+      leftArrowHover: require('@/assets/left-arrow-hover.png'),
+      rightArrow: require('@/assets/right-arrow.png'),  
+      rightArrowHover: require('@/assets/right-arrow-hover.png')
     };
   },
   methods: {
@@ -65,8 +73,30 @@ export default {
     stopAutoSlide() {
       clearInterval(this.timer);
     },
+    changeLeftArrowImage(hover) {  
+      const leftArrow = document.getElementById('slideLeftArrow');
+      leftArrow.src = hover ? this.leftArrowHover : this.leftArrow; 
+    },
+    changeRightArrowImage(hover) {    
+      const rightArrow = document.getElementById('slideRightArrow');  
+      rightArrow.src = hover ? this.rightArrowHover : this.rightArrow; 
+    }
   },
   mounted() {
+    const leftArrow = document.getElementById('slideLeftArrow');  
+    const rightArrow = document.getElementById('slideRightArrow');
+    leftArrow.addEventListener('mouseover', () => {  
+      this.changeLeftArrowImage(true);  
+    }); 
+    rightArrow.addEventListener('mouseover', () => {  
+      this.changeRightArrowImage(true);  
+    });  
+    leftArrow.addEventListener('mouseout', () => {  
+      this.changeLeftArrowImage(false);  
+    });
+    rightArrow.addEventListener('mouseout', () => {  
+      this.changeRightArrowImage(false);  
+    });
     this.startAutoSlide();
   },
   beforeUnmount() {
@@ -102,25 +132,30 @@ export default {
 
 .image-slide {
   position: absolute;
+  top: 0;  
+  left: 100%; /* 初始位置在容器的右侧 */
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: opacity 0.5s ease-in-out;
-  opacity: 0;
+  transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+  opacity: 0; 
 }
 
-.image-slide.active {
-  opacity: 1;
+.image-slide.active {  
+  left: 0; /* 滑动到容器的左侧 */  
+  opacity: 1;  
 }
-.text-slide,
-.image-slide {
+
+.text-slide {
   display: none;
+  transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
 }
 
-.text-slide.active,
-.image-slide.active {
+.text-slide.active {
   display: block;
-}
+  left: 0; /* 滑动到容器的左侧 */  
+  opacity: 1;
+} 
 
 .buttons {
   display: flex;
@@ -129,11 +164,12 @@ export default {
   width: 60px;
   height: 60px;
   border-radius: 60px;
-  background-color: #d6d6d6;
   margin: 5vw;
+  overflow: hidden;
 }
 
-.buttons:hover {
-  background-color: #8e8e8e;
+.buttons img {
+  width: 100%;
+  height: auto;
 }
 </style>

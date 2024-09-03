@@ -160,11 +160,13 @@ h1 {
 }
 
 .menuChart {
-  padding: 20px;
+  padding-left: 20px;
+  padding-right: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   width: 60%;
   height: 500px;
+  overflow-y: auto;
 }
 .menuChart::-webkit-scrollbar {
   width: 5px; /* 滚动条宽度 */
@@ -208,8 +210,8 @@ h1 {
   border-radius: 50%;
 }
 .dishImg img {
-  max-width: 100%;
-  max-height: 100%;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
 }
 .menuItem .dishPrice {

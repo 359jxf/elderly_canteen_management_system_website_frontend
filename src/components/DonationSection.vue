@@ -274,6 +274,11 @@ export default {
   font-size: 20px;
   transition: background-color 0.3s;
 }
+
+.donate-button:hover {
+  background-color: rgb(203, 127, 27);
+}
+
 .payment-methods button:hover {
   /* 鼠标移到上面 */
   color: #ffffff;

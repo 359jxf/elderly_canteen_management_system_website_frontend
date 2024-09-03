@@ -164,7 +164,7 @@ export default {
     },
 
     fetchDishs() {
-      const url = "http://127.0.0.1:4523/m1/4808550-4462943-default/api/dishes";
+      const url = "http://8.136.125.61/api/HomePage/dishes";
       axios
         .get(url)
         .then((res) => {
@@ -233,7 +233,7 @@ export default {
     async fetchMenus() {
       try {
         const response = await axios.get(
-          "http://127.0.0.1:4523/m1/4808550-4462943-default/getWeekmenuAndWeekDiscount"
+          "http://8.136.125.61/api/HomePage/getWeekmenuAndWeekDiscount"
         );
         const menuItems = response.data.response;
         this.mon = menuItems.filter((item) => item.week === this.weekdays[0]);
@@ -251,7 +251,7 @@ export default {
     async findDishOnSale() {
       try {
         const response = await axios.get(
-          "http://127.0.0.1:4523/m1/4808550-4462943-default/getWeekmenuAndWeekDiscount"
+          "http://8.136.125.61/api/HomePage/getWeekmenuAndWeekDiscount"
         );
         const menuItems = response.data.response;
         console.log(menuItems);
@@ -269,7 +269,7 @@ export default {
     async getScoreAndComments() {
       try {
         const response = await axios.get(
-          "http://127.0.0.1:4523/m1/4808550-4462943-default/getReviews"
+          "http://8.136.125.61/api/HomePage/getReviews"
         );
         this.comments = response.data.response;
         let totalStars = 0;
