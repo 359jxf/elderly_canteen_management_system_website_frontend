@@ -35,6 +35,18 @@ export default {
   overflow-x: auto;
 }
 
+.menuFrame::-webkit-scrollbar {
+  height: 5px; /* 滚动条宽度 */
+}
+.menuFrame::-webkit-scrollbar-thumb {
+  background-color: #cccccc; /* 滚动条滑块的颜色 */
+  border-radius: 2.5px; /* 滚动条滑块的圆角 */
+  opacity: 90%;
+}
+.menuFrame::-webkit-scrollbar-track {
+  opacity: 100%;
+}
+
 .dishOnSaleItem {
   flex: 0 0 14.2857%;
   border-right: 0.5mm dashed #cacaca;

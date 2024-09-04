@@ -62,6 +62,10 @@
             />
           </div>
           <div class="input-group">
+            <p>账户余额</p>
+            <div>{{ money }}元</div>
+          </div>
+          <div class="input-group">
             <p>头像</p>
             <input
               v-if="isEditing"
@@ -123,6 +127,7 @@ export default {
       phone: "", // 手机号
       gender: "", // 性别
       birthdate: "", // 出生日期
+      money: 0,
       avatar: null, // 上传的头像文件
       avatarPreview: null, // 头像预览URL
       defaultAvatar: new URL("../assets/defaultportrait.png", import.meta.url)
@@ -167,6 +172,7 @@ export default {
             this.phone = user.phoneNum;
             this.gender = user.gender;
             this.birthdate = user.birthDate;
+            this.money = user.money;
             // 拼接完整的图片URL
             this.avatarPreview = user.portrait
               ? `${user.portrait}`
@@ -396,7 +402,7 @@ a:hover {
   align-items: center;
   height: 20px;
   width: 100%;
-  margin: 20px 0;
+  margin: 15px 0;
   position: relative; /* 新增 */
 }
 

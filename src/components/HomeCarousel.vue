@@ -137,8 +137,19 @@ export default {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+  transition: transform 1.0s ease-in-out, opacity 1.0s ease-in-out;
   opacity: 0; 
+}
+
+@keyframes slide-left {  
+  0% { transform: translateX(100%); }  
+  100% { transform: translateX(-100%); }  
+}  
+  
+.active {  
+  /* 可能需要一些额外的样式来确保当前项显示正确 */  
+  position: relative; /* 确保当前项在顶层 */  
+  z-index: 1;  
 }
 
 .image-slide.active {  
@@ -148,7 +159,8 @@ export default {
 
 .text-slide {
   display: none;
-  transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+  transition: transform 1.0s ease-in-out, opacity 1.0s ease-in-out;
+  opacity: 0; 
 }
 
 .text-slide.active {

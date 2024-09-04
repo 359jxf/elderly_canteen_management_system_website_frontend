@@ -94,6 +94,35 @@ export default {
   overflow-x: hidden;
   border-right: 0.5mm dashed #cacaca;
 }
+.MON::-webkit-scrollbar,
+.TUE::-webkit-scrollbar,
+.WED::-webkit-scrollbar,
+.THU::-webkit-scrollbar,
+.FRI::-webkit-scrollbar,
+.SAT::-webkit-scrollbar,
+.SUN::-webkit-scrollbar {
+  width: 5px; /* 滚动条宽度 */
+}
+.MON::-webkit-scrollbar-thumb,
+.TUE::-webkit-scrollbar-thumb,
+.WED::-webkit-scrollbar-thumb,
+.THU::-webkit-scrollbar-thumb,
+.FRI::-webkit-scrollbar-thumb,
+.SAT::-webkit-scrollbar-thumb,
+.SUN::-webkit-scrollbar-thumb {
+  background-color: #cccccc; /* 滚动条滑块的颜色 */
+  border-radius: 2.5px; /* 滚动条滑块的圆角 */
+  opacity: 90%;
+}
+.MON::-webkit-scrollbar-track,
+.TUE::-webkit-scrollbar-track,
+.WED::-webkit-scrollbar-track,
+.THU::-webkit-scrollbar-track,
+.FRI::-webkit-scrollbar-track,
+.SAT::-webkit-scrollbar-track,
+.SUN::-webkit-scrollbar-track {
+  opacity: 100%;
+}
 
 .menuFrameItem {
   border-right: 0.5mm dashed #cacaca;
