@@ -133,6 +133,7 @@ export default {
 .menuFrame div h2 {
   height: 40px;
   color: rgb(229, 107, 78);
+  background-color: #fffcf7;
   text-align: center;
   margin-top: 0px;
   margin-bottom: 5px;
