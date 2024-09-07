@@ -251,21 +251,19 @@ export default {
     async findDishOnSale() {
       try {
         const response = await axios.get(
-          "http://8.136.125.61/api/HomePage/getWeekmenuAndWeekDiscount"
+          "http://8.136.125.61/api/HomePage/getDayDiscount"
         );
         const menuItems = response.data.response;
         // 初始化一个空对象来存储已遇到的菜品名称  
         const seenNames = {};    
         menuItems.forEach(item => {  
-          // 检查菜品是否在打折且属于当前周  
-          if (item.disPrice !== 0 && this.weekdays.includes(item.week)) {  
             // 检查菜品名称是否已被记录  
             if (!seenNames[item.dishName]) {  
               // 如果没有，则添加到dishOnSale和seenNames中  
               this.dishOnSale.push(item);  
               seenNames[item.dishName] = true;  
             }  
-          }  
+          
         });
       } catch (error) {
         console.error("Failed to fetch menus:", error);

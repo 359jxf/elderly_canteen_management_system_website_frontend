@@ -2,7 +2,7 @@
 <template>
   <div class="weekDiscount">
     <h1 style="color: rgb(249, 194, 60); margin-left: 5vh; font-size: 36px">
-      本周促销📣
+      今日促销📣
     </h1>
     <div class="menuFrame">
       <div v-for="item in dishOnSale" :key="item.id" class="dishOnSaleItem">

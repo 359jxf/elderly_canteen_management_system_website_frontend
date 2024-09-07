@@ -3,8 +3,8 @@
   <div class="footer">
     <div class="contact-info">
       <div class="contact-header">联系我们</div>
-      <p>地址: XXXXXXXXX</p>
-      <p>电话: XXXXXXXXX</p>
+      <p>地址: 上海市嘉定区曹安公路4800号</p>
+      <p>电话: 123456</p>
     </div>
     <div class="qrcode">
       <div class="qrcode-header">手机程序二维码</div>

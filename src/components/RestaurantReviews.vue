@@ -14,7 +14,7 @@
             <template v-for="n in 5" :key="n">
               <span
                 :class="
-                  n <= comprehensiveScore / 2 ? 'star yellow' : 'star gray'
+                  n <= comprehensiveScore ? 'star yellow' : 'star gray'
                 "
               ></span>
             </template>
@@ -33,7 +33,7 @@
             <div class="commentStars">
               <template v-for="n in 5" :key="n">
                 <span
-                  :class="n <= comment.cStars / 2 ? 'star yellow' : 'star gray'"
+                  :class="n <= comment.cStars ? 'star yellow' : 'star gray'"
                 ></span>
               </template>
             </div>
