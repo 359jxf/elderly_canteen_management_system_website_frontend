@@ -268,7 +268,7 @@ export default {
         this.currentPage = pageNum; // 设置当前页码
         this.pageInput = ''; // 清空输入框
       } else {
-        alert('请输入有效的页码'); // 添加简单的页码验证
+        // alert('请输入有效的页码'); // 添加简单的页码验证
       }
     },
     fetchAdmins() {
@@ -276,12 +276,13 @@ export default {
       if (this.searchName) params.name = this.searchName;
       if (this.searchPosition) params.position = this.searchPosition;
       const token = localStorage.getItem("token"); // 获取存储的 token
-      axios.get('http://8.136.125.61/api/admin/search', 
-      {headers: {
-        'Authorization': `Bearer ${token}` // 添加 token 到请求头
-      }, 
-      params })
-    
+      axios.get('http://8.136.125.61/api/admin/search', {
+        headers: {
+          'Authorization': `Bearer ${token}` // headers在第二个参数
+        },
+        params
+      })
+
           .then(response => {
             if (response.data && response.data.success) {
               this.admins = response.data.response || [];
@@ -351,11 +352,12 @@ export default {
         return;
       }
       const token = localStorage.getItem("token"); // 获取存储的 token
-      axios.post('http://8.136.125.61/api/admin/add', this.newAdmin,{
-            headers: {
-              'Authorization': `Bearer ${token}` // 添加 token 到请求头
-            }
-          })
+      axios.post('http://8.136.125.61/api/admin/add', this.newAdmin, {
+        headers: {
+          'Authorization': `Bearer ${token}` // headers在第三个参数
+        }
+      })
+
           .then(response => {
             if (response.data && response.data.success) {
               this.showSuccess('管理员添加成功');
@@ -447,11 +449,12 @@ export default {
         gender: genderValue
       };
       const token = localStorage.getItem("token"); // 获取存储的 token
-      axios.put(`http://8.136.125.61/api/admin/${adminId}`, updateData,{
-            headers: {
-              'Authorization': `Bearer ${token}` // 添加 token 到请求头
-            }
-          })
+      axios.put(`http://8.136.125.61/api/admin/${adminId}`, updateData, {
+        headers: {
+          'Authorization': `Bearer ${token}` // headers在第三个参数
+        }
+      })
+
           .then(response => {
             if (response.data && response.data.success) {
               this.showSuccess('管理员信息更新成功');
@@ -467,11 +470,12 @@ export default {
     },
     deleteAdmin(adminId) {
       const token = localStorage.getItem("token"); // 获取存储的 token
-      axios.delete(`http://8.136.125.61/api/admin/${adminId}`,{
-            headers: {
-              'Authorization': `Bearer ${token}` // 添加 token 到请求头
-            }
-          })
+      axios.delete(`http://8.136.125.61/api/admin/${adminId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}` // headers在第二个参数
+        }
+      })
+
           .then(response => {
             if (response.data && response.data.success) {
               this.showSuccess(response.data.msg || '删除成功');

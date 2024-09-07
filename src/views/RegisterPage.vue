@@ -87,7 +87,7 @@
           </div>
           <div class="input-group">
             <p>头像</p>
-            <input type="file" @change="handleAvatarUpload" />
+            <input class="avatar" type="file" @change="handleAvatarUpload" />
           </div>
           <div class="avatar-preview">
             <img :src="avatarPreview || defaultAvatar" alt="头像预览" />
@@ -358,6 +358,7 @@ export default {
   height: 680px; /* 增加高度以适应更多字段 */
   padding: 10px 50px;
   font-size: 15px;
+  overflow-y: scroll;
 }
 
 a {
@@ -419,6 +420,7 @@ button {
   margin: 20px 0;
   text-align: center;
   background-color: #de6700;
+  width: 100px;
   color: white;
   border-radius: 5px;
   cursor: pointer;
@@ -506,5 +508,9 @@ button {
 .disabledButton {
   background-color: rgba(135, 130, 130, 0.5);
   cursor: not-allowed;
+}
+.avatar {
+  width: 60%;
+  border: none;
 }
 </style>

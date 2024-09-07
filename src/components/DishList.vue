@@ -130,10 +130,6 @@ import axios from 'axios';
 
 axios.defaults.baseURL = 'http://8.136.125.61';
 
-// 设置 axios 默认的 Authorization 头
-const token = localStorage.getItem("token"); // 获取存储的 token
-axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
 export default {
   setup() {
     const isLoading = ref(false);  // 追踪是否正在加载数据
@@ -171,10 +167,13 @@ export default {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get('/api/category/search', {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        params: {
+          // 如果有查询参数，可以放在这里
+        }
+      });
         
         if (response.data.success) {
           categories.value = response.data.cates;
@@ -372,13 +371,14 @@ export default {
         };
         const token = localStorage.getItem("token"); // 获取存储的 token
         const response = await axios.post('/api/dish/addDish',
-          requestData,  // 第二个参数为请求主体数据
-          {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
+        requestData,  // 这是请求的 body 数据
+        {
+          headers: {
+            Authorization: `Bearer ${token}`  // headers 放在第三个参数
           }
-        );
+        }
+      );
+
 
         if (response.data.success) {
           dishes.value.push(response.data.dish);

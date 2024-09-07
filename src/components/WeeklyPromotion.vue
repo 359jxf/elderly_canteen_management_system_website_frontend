@@ -52,21 +52,24 @@
         <td>{{ dish.name }}</td>
         <td>{{ dish.category }}</td>
         <td>
-          {{ dish.originalPrice !== undefined ? dish.originalPrice.toFixed(2) : 'N/A' }} 元
+          {{ dish.originalPrice !== undefined ? dish.originalPrice.toFixed(2) : '暂无折扣' }} 元
         </td>
         <td>
-          {{ dish.currentPrice !== undefined ? dish.currentPrice.toFixed(2) : 'N/A' }} 元
+          {{ dish.currentPrice !== undefined ? dish.currentPrice.toFixed(2) : '暂无折扣' }} 元
         </td>
         <td>
           <div v-if="editingIndex === index">
-            <input type="number" v-model="dish.discountRate" min="0" max="100" step="1" class="edit-input" />
+            <div>
+              <input type="number" v-model="dish.discountRate" min="0" max="100" step="1" class="edit-input" />
+              <label>%</label>
+            </div>
             <div class="edit-buttons">
               <button @click="confirmEdit(dish.id)" class="confirm-button small">确认</button>
               <button @click="cancelEdit" class="cancel-button small">取消</button>
             </div>
           </div>
           <div v-else>
-            {{ dish.discountRate ? dish.discountRate + '%' : 'N/A' }}
+            {{ dish.discountRate ? dish.discountRate.toFixed(2) + '%' : '暂无折扣' }}
           </div>
         </td>
 

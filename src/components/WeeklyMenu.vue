@@ -306,7 +306,7 @@ export default {
             }
             });
       } else {
-        alert("请选择一个菜品和日期以添加。");
+        this.show("请选择一个菜品和日期以添加。");
       }
     },
 

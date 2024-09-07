@@ -142,7 +142,7 @@ export default {
         this.currentPage = pageNum; // 设置当前页码
         this.pageInput = ''; // 清空输入框
       } else {
-        alert('请输入有效的页码'); // 添加简单的页码验证
+        // alert('请输入有效的页码'); // 添加简单的页码验证
       }
     },
     search() {
@@ -163,7 +163,7 @@ export default {
         });
         this.closeAddAnnouncementModal();
       } else {
-        alert('请填写所有字段');
+        // alert('请填写所有字段');
       }
     },
     showDraftModal() {

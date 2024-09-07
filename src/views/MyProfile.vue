@@ -68,6 +68,7 @@
           <div class="input-group">
             <p>头像</p>
             <input
+              class="avatar"
               v-if="isEditing"
               type="file"
               @change="handleAvatarUpload"
@@ -426,6 +427,7 @@ a:hover {
   justify-content: space-between;
   align-items: center;
   gap: 10px;
+  margin-bottom: -8px;
 }
 
 .btn {
@@ -512,5 +514,8 @@ a:hover {
   opacity: 1;
   transition: opacity 0.5s ease-in-out;
 }
-
+.avatar {
+  width: 60%;
+  border: none;
+}
 </style>

@@ -334,7 +334,7 @@ export default {
           this.resetNewItem();        // 重置表单
         } else {
           console.error('添加食材失败', response.data.message || response);
-          alert(response.data.message);
+          this.show(response.data.message);
         }
       } catch (error) {
         console.error('请求失败', error.response ? error.response.data : error.message);

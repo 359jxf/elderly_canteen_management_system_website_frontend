@@ -1,5 +1,8 @@
 <template>
   <div class="tab-content-3">
+    <transition name="fade">
+      <div v-if="showMessage" class="message-popup">{{ showMessage }}</div>
+    </transition>
     <!-- 静态展示账户信息 -->
     <div class="form-group" v-for="(field, index) in fields" :key="index">
       <div class="label-container">
@@ -82,6 +85,7 @@ export default {
     return {
       isEditing: false, // 编辑模式标志
       isLogout: false, 
+      showMessage: "",
       showChangePhone: false, // 控制手机号模态框的显示
       showChangePassword: false, // 控制密码模态框的显示
       fields: [
@@ -169,9 +173,15 @@ export default {
     validatePhoneNumber() {
       const phoneNumField = this.fields.find(field => field.name === 'phoneNum');
       if (phoneNumField.value.length !== 11) {
-        alert('电话号码必须为11位，请重新输入');
+        this.show('电话号码必须为11位，请重新输入');
         phoneNumField.value = ''; // 清空错误输入
       }
+    },
+    show(message) {
+      this.showMessage = message;
+      setTimeout(() => {
+        this.showMessage = "";
+      }, 1000); // 错误信息3秒后消失
     },
     showChangePhoneModal() {
       this.showChangePhone = true; // 显示改绑手机号的模态框
@@ -292,5 +302,19 @@ label {
 
 select,input {
   border: 2px solid black;
+}
+
+.message-popup {
+  position: fixed;
+  bottom: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.6);
+  color: rgb(255, 255, 255);
+  padding: 10px 20px;
+  border-radius: 5px;
+  z-index: 999;
+  opacity: 1;
+  transition: opacity 0.5s ease-in-out;
 }
 </style>

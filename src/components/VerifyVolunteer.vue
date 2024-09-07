@@ -20,10 +20,10 @@
           <td>{{ application.accountId }}</td>
           <td>{{ application.applicationDate }}</td>
           <td>
-            <button @click="viewApplication(application.applicationId)">查看详情</button>
+            <button class="btn" @click="viewApplication(application.applicationId)">查看详情</button>
           </td>
           <td>
-            <button @click="openApproveDialog(application)">审核</button>
+            <button class="btn" @click="openApproveDialog(application)">审核</button>
           </td>
         </tr>
       </tbody>
@@ -37,7 +37,7 @@
       <p>手机号: {{ selectedApplication.phoneNum }}</p>
       <p>身份证号: {{ selectedApplication.idCard }}</p>
       <p>申请理由: {{ selectedApplication.selfStatement }}</p>
-      <button @click="closeDetails">关闭</button>
+      <button class="btn" @click="closeDetails">关闭</button>
     </div>
 
     <div v-if="showApproveDialog" class="approve-dialog">
@@ -319,5 +319,10 @@ select,input {
   z-index: 999;
   opacity: 1;
   transition: opacity 0.5s ease-in-out;
+}
+.btn {
+  border: 2px solid rgb(49, 81, 195);
+  border-radius: 6px;
+  color: rgb(49, 81, 195);
 }
 </style>

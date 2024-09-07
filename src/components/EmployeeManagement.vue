@@ -129,6 +129,7 @@
         </div>
       </div>
     </div>
+    <div v-if="notification.message" class="notification" :class="notification.type">{{ notification.message }}</div>
   </div>
 </template>
 
@@ -153,7 +154,7 @@ export default {
       employeePosition: '',
       salary: ''
     });
-    const positions = ref(['财务','职工','仓库','用户','总管理']);
+    const positions = ref(['财务','职工','仓库','总管理']);
     const searchName = ref('');
     const searchPosition = ref('');
     const currentPage = ref(1);
@@ -162,6 +163,7 @@ export default {
     const selectedEmployees = ref([]);
     const selectAll = ref(false);
     const pageInput = ref('');
+    const notification = ref({ message: '', type: '' });
 
     const fetchEmployees = async () => {
       try {
@@ -237,12 +239,12 @@ export default {
 
     const addEmployee = async () => {
       if (employeeForm.phoneNum.length !== 11) {
-        alert('电话号码必须为11位,请重新输入。');
+        showNotification(`电话号码必须为11位,请重新输入。`, 'error');
         return;
       }
 
       if (employeeForm.idCard.length !== 18) {
-        alert('身份证号必须为18位,请重新输入。');
+        showNotification(`身份证号必须为18位,请重新输入。`, 'error');
         return;
       }
       try {
@@ -268,15 +270,20 @@ export default {
         }
       }
     };
-
+    const showNotification = (message, type = 'info') => {
+      notification.value = { message, type };
+      setTimeout(() => {
+        notification.value = { message: '', type: '' };
+      }, 3000);
+    };
     const updateEmployee = async () => {
       if (employeeForm.phoneNum.length !== 11) {
-        alert('电话号码必须为11位,请重新输入。');
+        showNotification(`电话号码必须为11位,请重新输入。`, 'error');
         return;
       }
 
       if (employeeForm.idCard.length !== 18) {
-        alert('身份证号必须为18位,请重新输入。');
+        showNotification(`身份证号必须为18位,请重新输入。`, 'error');
         return;
       }
 
@@ -332,7 +339,7 @@ export default {
         });
 
         if (response.status === 200) {
-          alert('工资发放成功');
+          showNotification(`工资发放成功`, 'success');
           fetchEmployees();
           closeBatchModal();
         } else {
@@ -401,7 +408,8 @@ export default {
       batchPaySalary,
       search,
       toggleSelectAll,
-      changePage
+      changePage,
+      notification,
     };
   }
 };
@@ -710,6 +718,30 @@ export default {
   margin: 0 5px;
 }
 
+.notification {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 20px;
+  border-radius: 5px;
+  background-color: #333;
+  color: #fff;
+  opacity: 0.9;
+  z-index: 1001;
+}
+
+.notification.info {
+  background-color: #007bff;
+}
+
+.notification.success {
+  background-color: #28a745;
+}
+
+.notification.error {
+  background-color: #dc3545;
+}
 .message-popup {
   position: absolute;
   top: -40px; /* 相对于模态框标题的上方 */
