@@ -125,4 +125,7 @@ p {
   cursor: pointer;
   margin-top: 10px;
 }
+select,input {
+  border: 2px solid black;
+}
 </style>

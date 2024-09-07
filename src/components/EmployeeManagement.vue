@@ -718,4 +718,7 @@ export default {
 .fade-leave-to {
   opacity: 0;
 }
+select,input {
+  border: 2px solid black;
+}
 </style>

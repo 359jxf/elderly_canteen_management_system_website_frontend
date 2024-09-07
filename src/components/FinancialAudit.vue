@@ -92,19 +92,26 @@ export default {
       }
     },
     fetchFinancialRecords() {
-      fetch('http://8.136.125.61/api/Finance/financial-records?status=待审核')
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              this.items = data.response || [];
-              this.filteredItems = this.items;
-            } else {
-              this.showError('获取数据失败: ' + data.msg);
-            }
-          })
-          .catch(() => {
-            this.showError('获取数据时发生错误。');
-          });
+      const token = localStorage.getItem("token"); // 获取存储的 token
+      fetch('http://8.136.125.61/api/Finance/financial-records?status=待审核', {
+        method: 'GET', // 默认是 GET 请求
+        headers: {
+          'Authorization': `Bearer ${token}`, 
+        }
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            this.items = data.response || [];
+            this.filteredItems = this.items;
+          } else {
+            this.showError('获取数据失败: ' + data.msg);
+          }
+        })
+        .catch(() => {
+          this.showError('获取数据时发生错误。');
+        });
+
     },
     search() {
       this.filteredItems = this.items.filter(item => {
@@ -116,37 +123,42 @@ export default {
       this.currentPage = 1;
     },
     updateStatus(id, status) {
-      const url = `http://8.136.125.61/api/Finance/financial-records/${id}/status`;
-      const data = { Status: status };
-      const token = localStorage.getItem("token"); // 获取存储的 token
-      fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(data)
-      })
-          .then(response => {
-            if (!response.ok) {
-              return response.json().then(errData => {
-                throw new Error(errData.msg || '未知错误');
-              });
-            }
-            return response.json();
-          })
-          .then(data => {
-            if (data.success) {
-              this.showSuccess(`状态更新成功: ${status}`);
-              this.fetchFinancialRecords();
-            } else {
-              this.showError('状态更新失败: ' + data.msg);
-            }
-          })
-          .catch(error => {
-            this.showError('更新状态时发生错误：' + error.message);
-          });
+  const url = `http://8.136.125.61/api/Finance/financial-records/${id}/status`;
+  const data = { Status: status };
+  const token = localStorage.getItem("token"); // 获取存储的 token
+  
+  fetch(url, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json' // 设置 Content-Type 为 application/json
     },
+    body: JSON.stringify(data) // 将 data 转换为 JSON 字符串
+  })
+  .then(response => {
+    if (!response.ok) {
+      return response.json().then(errData => {
+        throw new Error(errData.msg || '未知错误');
+      });
+    }
+    return response.json();
+  })
+  .then(data => {
+    if (data.success) {
+      this.showSuccess(`状态更新成功: ${status}`);
+      this.fetchFinancialRecords();
+    } else {
+      this.showError('状态更新失败: ' + data.msg);
+    }
+  })
+  .catch(error => {
+    if (error.response) {
+      this.showError('更新状态时发生错误：' + error.response.data.message);
+    } else {
+      this.showError('更新状态时发生错误：' + error.message);
+    }
+  });
+},
     prevPage() {
       if (this.currentPage > 1) {
         this.currentPage--;
@@ -190,6 +202,7 @@ export default {
   display: flex;
   align-items: center;
   margin-bottom: 20px;
+  background-color: rgba(225, 217, 208, 0.5);
 }
 
 .search-bar input {
@@ -311,5 +324,9 @@ export default {
 
 .fade-enter, .fade-leave-to {
   opacity: 0;
+}
+
+select,input {
+  border: 2px solid black;
 }
 </style>

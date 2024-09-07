@@ -337,4 +337,7 @@ textarea {
   border: 1px solid #ddd;
   font-size: 14px;
 }
+select,input {
+  border: 2px solid black;
+}
 </style>

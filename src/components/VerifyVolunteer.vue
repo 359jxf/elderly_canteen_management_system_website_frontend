@@ -291,4 +291,7 @@ textarea {
   font-size: 16px;
   cursor: pointer;
 }
+select,input {
+  border: 2px solid black;
+}
 </style>

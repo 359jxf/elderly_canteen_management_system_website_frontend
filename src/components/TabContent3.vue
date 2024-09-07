@@ -289,4 +289,8 @@ label {
   display: flex;
   align-items: center;
 }
+
+select,input {
+  border: 2px solid black;
+}
 </style>

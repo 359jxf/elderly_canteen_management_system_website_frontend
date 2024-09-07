@@ -92,4 +92,8 @@ export default {
 .tab-content {
   padding: 20px;
 }
+
+select,input {
+  border: 2px solid black;
+}
 </style>

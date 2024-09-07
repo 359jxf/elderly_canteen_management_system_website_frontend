@@ -632,4 +632,7 @@ export default {
   flex: 1;
   margin-right: 10px;
 }
+select,input {
+  border: 2px solid black;
+}
 </style>

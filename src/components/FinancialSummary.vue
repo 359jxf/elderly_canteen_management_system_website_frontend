@@ -8,7 +8,6 @@
         <option value="进货">进货</option>
         <option value="工资">工资</option>
         <option value="点单">点单</option>
-        <option value="订单">订单</option>
       </select>
       <select v-model="searchType">
         <option value="">收支</option>
@@ -115,27 +114,43 @@ export default {
       }
     },
     async fetchData() {
-      try {
-        const formattedDate = this.searchDate ? this.searchDate : '';
-        const response = await fetch(`http://8.136.125.61/api/Finance/financial-records?financeType=${this.searchSource}&inOrOut=${this.searchType}&financeDate=${formattedDate}`);
-        const data = await response.json();
-        this.items = data.response || [];
-        this.filteredItems = this.items;
-      } catch (error) {
-        console.error('数据获取错误:', error);
+  try {
+    const token = localStorage.getItem("token"); // 获取存储的 token
+    const formattedDate = this.searchDate ? this.searchDate : '';
+    const response = await fetch(`http://8.136.125.61/api/Finance/financial-records?financeType=${this.searchSource}&inOrOut=${this.searchType}&financeDate=${formattedDate}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`, // 添加 Authorization 头
+        'Content-Type': 'application/json'  // 根据需要设置 Content-Type
       }
-    },
-    async fetchTotal() {
-      try {
-        const response = await fetch(`http://8.136.125.61/api/Finance/getTotal`);
-        const data = await response.json();
-        this.netIncome = data.response.netIn; // 设置净收入
-        this.totalIncome = data.response.totalIn; // 设置总收入
-        this.totalExpense = data.response.totalOut; // 设置总支出
-      } catch (error) {
-        console.error('获取总收入、总支出和净收入时发生错误:', error);
+    });
+    const data = await response.json();
+    this.items = data.response || [];
+    this.filteredItems = this.items;
+  } catch (error) {
+    console.error('数据获取错误:', error);
+  }
+},
+
+async fetchTotal() {
+  try {
+    const token = localStorage.getItem("token"); // 获取存储的 token
+    const response = await fetch(`http://8.136.125.61/api/Finance/getTotal`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`, // 添加 Authorization 头
+        'Content-Type': 'application/json'  // 根据需要设置 Content-Type
       }
-    },
+    });
+    const data = await response.json();
+    this.netIncome = data.response.netIn; // 设置净收入
+    this.totalIncome = data.response.totalIn; // 设置总收入
+    this.totalExpense = data.response.totalOut; // 设置总支出
+  } catch (error) {
+    console.error('获取总收入、总支出和净收入时发生错误:', error);
+  }
+},
+
     search() {
       this.fetchData(); // 通过API获取过滤后的数据
       this.fetchTotal(); // 同时获取最新的总收入、总支出和净收入
@@ -258,5 +273,8 @@ export default {
 .pagination .active {
   font-weight: bold;
   text-decoration: underline;
+}
+select,input {
+  border: 2px solid black;
 }
 </style>
