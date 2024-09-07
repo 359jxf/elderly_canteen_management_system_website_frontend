@@ -1,12 +1,12 @@
 <!-- views/HomePage.vue -->
 <template>
-  <div>
+  <div class="back">
     <Header :loggedIn="isLoggedIn" :user="currentUser" />
     <Banner />
     <Carousel :texts="texts" :subtexts="subtexts" :images="images" />
     <main>
       <MenuSearch :menuItems="menuItems" />
-      <WeeklyMenu
+      <WeekMenu
         :mon="mon"
         :tue="tue"
         :wed="wed"
@@ -15,7 +15,7 @@
         :sat="sat"
         :sun="sun"
       />
-      <WeeklyPromotion :dishOnSale="dishOnSale" />
+      <WeekPromotion :dishOnSale="dishOnSale" />
       <RestaurantReviews
         :comprehensiveScore="comprehensiveScore"
         :comments="comments"
@@ -39,8 +39,8 @@ import Header from "@/components/HomeHeader.vue";
 import Banner from "@/components/HomeBanner.vue";
 import Carousel from "@/components/HomeCarousel.vue";
 import MenuSearch from "@/components/MenuSearch.vue";
-import WeeklyMenu from "@/components/WeeklyMenu.vue";
-import WeeklyPromotion from "@/components/WeeklyPromotion.vue";
+import WeekMenu from "@/components/WeekMenu.vue";
+import WeekPromotion from "@/components/WeekPromotion.vue";
 import RestaurantReviews from "@/components/RestaurantReviews.vue";
 import DonationSection from "@/components/DonationSection.vue";
 import Footer from "@/components/HomeFooter.vue";
@@ -51,8 +51,8 @@ export default {
     Banner,
     Carousel,
     MenuSearch,
-    WeeklyMenu,
-    WeeklyPromotion,
+    WeekMenu,
+    WeekPromotion,
     RestaurantReviews,
     DonationSection,
     Footer,
@@ -318,3 +318,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.back {
+  background-color: rgb(255, 255, 255);
+}
+</style>

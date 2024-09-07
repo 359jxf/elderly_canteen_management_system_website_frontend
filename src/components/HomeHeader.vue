@@ -64,7 +64,7 @@ export default {
       if(role=='admin'){
         this.show("管理员身份认证成功！正在跳转...");
         await this.sleep(2000);
-        this.$router.push("/profile");//管理员页
+        this.$router.push("/admin");//管理员页
       }
       else{
         this.$router.push("/profile");

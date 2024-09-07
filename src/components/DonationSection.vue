@@ -229,7 +229,7 @@ export default {
 <style scoped>
 .donation {
   background-image: url("@/assets/donate.jpg"); /* 背景图片路径 */
-  background-size: auto 100%; /* 背景图片宽度对齐，高度自动调整 */
+  background-size: 100% auto; /* 背景图片宽度对齐，高度自动调整 */
   background-repeat: no-repeat; /* 防止背景图片重复 */
   background-position: top; /* 背景图片居中对齐 */
   display: flex;

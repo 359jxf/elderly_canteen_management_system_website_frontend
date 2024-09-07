@@ -5,6 +5,7 @@ import OTPLoginPage from "../views/OTPLoginPage.vue";
 import RegisterPage from "../views/RegisterPage.vue";
 import NewpsdPage from "../views/NewpsdPage.vue";
 import MyProfile from "../views/MyProfile.vue";
+import AdminPage from "../views/AdminPage.vue";
 
 const routes = [
   {
@@ -41,6 +42,12 @@ const routes = [
     path: "/profile",
     name: "MyProfile",
     component: MyProfile,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/admin",
+    name: "AdminPage",
+    component: AdminPage,
     meta: { requiresAuth: true },
   },
 ];
