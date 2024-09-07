@@ -11,8 +11,8 @@
       </select>
       <select v-model="searchType">
         <option value="">收支</option>
-        <option value="1">收入</option>
-        <option value="0">支出</option>
+        <option value="0">收入</option>
+        <option value="1">支出</option>
       </select>
       <input type="date" v-model="searchDate" />
       <button class="btn blue" @click="search">搜索</button>
@@ -52,7 +52,7 @@
         <td>{{ item.administratorId }}</td>
         <td>{{ item.price }}</td>
         <td>{{ item.financeDate }}</td>
-        <td>{{ item.inOrOut === '1' ? '收入' : '支出' }}</td>
+        <td>{{ item.inOrOut === '0' ? '收入' : '支出' }}</td>
         <td>{{ item.status }}</td>
       </tr>
       </tbody>

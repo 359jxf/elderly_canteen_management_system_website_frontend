@@ -202,8 +202,13 @@ export default {
       }
     },
     fetchUsers() {
+      const token = localStorage.getItem("token"); // 获取存储的 token
       axios
-          .get('http://8.136.125.61/api/users/search')
+          .get('http://8.136.125.61/api/users/search', {
+            headers: {
+              'Authorization': `Bearer ${token}` // 添加 token 到请求头
+            }
+          })
           .then((response) => {
             this.users = response.data.response || [];
             this.filteredUsers = this.users;
@@ -213,8 +218,12 @@ export default {
           });
     },
     search() {
+      const token = localStorage.getItem("token"); // 获取存储的 token
       axios
           .get('http://8.136.125.61/api/users/search', {
+            headers: {
+              'Authorization': `Bearer ${token}` // 添加 token 到请求头
+            },
             params: {
               accountName: this.searchName || undefined,
               identity: this.searchIdentity || undefined,
@@ -238,7 +247,12 @@ export default {
     },
     viewDetail(user) {
       if (!user) return;
-      axios.get(`http://8.136.125.61/api/users/${user.accountId}`)
+      const token = localStorage.getItem("token"); // 获取存储的 token
+      axios.get(`http://8.136.125.61/api/users/${user.accountId}`, {
+            headers: {
+              'Authorization': `Bearer ${token}` // 添加 token 到请求头
+            }
+          })
           .then(response => {
             if (response.data.success) {
               const userData = response.data.response[0];
@@ -265,7 +279,12 @@ export default {
       this.showResetPasswordConfirm = true;
     },
     resetPassword(user) {
-      axios.post(`http://8.136.125.61/api/users/resetpsd/${user.accountId}`)
+      const token = localStorage.getItem("token"); // 获取存储的 token
+      axios.post(`http://8.136.125.61/api/users/resetpsd/${user.accountId}`, {
+            headers: {
+              'Authorization': `Bearer ${token}` // 添加 token 到请求头
+            }
+          })
           .then(response => {
             this.newPassword = response.data.password || '';
             this.selectedUser = { ...user, password: this.newPassword };
@@ -307,8 +326,12 @@ export default {
         gender: this.selectedUser.gender === '男' ? 'male' : 'female',
         identity: this.selectedUser.identity === '普通用户' ? 'user' : this.selectedUser.identity === '志愿者' ? 'volunteer' : 'senior'
       };
-
-      axios.put(`http://8.136.125.61/api/users/${this.selectedUser.accountId}`, updatedUser)
+      const token = localStorage.getItem("token"); // 获取存储的 token
+      axios.put(`http://8.136.125.61/api/users/${this.selectedUser.accountId}`, updatedUser,{
+            headers: {
+              'Authorization': `Bearer ${token}` // 添加 token 到请求头
+            }
+          })
           .then(() => {
             const index = this.users.findIndex(u => u.accountId === this.selectedUser.accountId);
             if (index !== -1) {
@@ -322,7 +345,12 @@ export default {
           });
     },
     deleteUser(userId) {
-      axios.delete(`http://8.136.125.61/api/users/${userId}`)
+      const token = localStorage.getItem("token"); // 获取存储的 token
+      axios.delete(`http://8.136.125.61/api/users/${userId}`, {
+            headers: {
+              'Authorization': `Bearer ${token}` // 添加 token 到请求头
+            }
+          })
           .then(() => {
             this.users = this.users.filter(u => u.accountId !== userId);
             this.filteredUsers = this.users;

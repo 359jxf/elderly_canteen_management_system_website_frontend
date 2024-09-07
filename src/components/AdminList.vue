@@ -275,8 +275,13 @@ export default {
       const params = {};
       if (this.searchName) params.name = this.searchName;
       if (this.searchPosition) params.position = this.searchPosition;
-
-      axios.get('http://8.136.125.61/api/admin/search', { params })
+      const token = localStorage.getItem("token"); // 获取存储的 token
+      axios.get('http://8.136.125.61/api/admin/search', 
+      {headers: {
+        'Authorization': `Bearer ${token}` // 添加 token 到请求头
+      }, 
+      params })
+    
           .then(response => {
             if (response.data && response.data.success) {
               this.admins = response.data.response || [];
@@ -308,7 +313,12 @@ export default {
     },
     viewDetails(admin) {
       const adminId = admin.accountId;
-      axios.get(`http://8.136.125.61/api/admin/${adminId}`)
+      const token = localStorage.getItem("token"); // 获取存储的 token
+      axios.get(`http://8.136.125.61/api/admin/${adminId}`, {
+            headers: {
+              'Authorization': `Bearer ${token}` // 添加 token 到请求头
+            }
+          })
           .then(response => {
             if (response.data && response.data.success) {
               this.selectedAdmin = response.data.response[0];
@@ -340,8 +350,12 @@ export default {
         this.showError('身份证号必须为18位，请重新输入');
         return;
       }
-
-      axios.post('http://8.136.125.61/api/admin/add', this.newAdmin)
+      const token = localStorage.getItem("token"); // 获取存储的 token
+      axios.post('http://8.136.125.61/api/admin/add', this.newAdmin,{
+            headers: {
+              'Authorization': `Bearer ${token}` // 添加 token 到请求头
+            }
+          })
           .then(response => {
             if (response.data && response.data.success) {
               this.showSuccess('管理员添加成功');
@@ -376,7 +390,12 @@ export default {
     },
     // 重置密码
     resetPassword(admin) {
-      axios.post(`http://8.136.125.61/api/users/resetpsd/${admin.accountId}`)
+      const token = localStorage.getItem("token"); // 获取存储的 token
+      axios.post(`http://8.136.125.61/api/users/resetpsd/${admin.accountId}`, {
+            headers: {
+              'Authorization': `Bearer ${token}` // 添加 token 到请求头
+            }
+          })
           .then(response => {
             if (response.data && response.data.success) {
               this.newPassword = response.data.password || ''; // 获取新的密码
@@ -427,8 +446,12 @@ export default {
         position: this.selectedAdmin.position,
         gender: genderValue
       };
-
-      axios.put(`http://8.136.125.61/api/admin/${adminId}`, updateData)
+      const token = localStorage.getItem("token"); // 获取存储的 token
+      axios.put(`http://8.136.125.61/api/admin/${adminId}`, updateData,{
+            headers: {
+              'Authorization': `Bearer ${token}` // 添加 token 到请求头
+            }
+          })
           .then(response => {
             if (response.data && response.data.success) {
               this.showSuccess('管理员信息更新成功');
@@ -443,7 +466,12 @@ export default {
           });
     },
     deleteAdmin(adminId) {
-      axios.delete(`http://8.136.125.61/api/admin/${adminId}`)
+      const token = localStorage.getItem("token"); // 获取存储的 token
+      axios.delete(`http://8.136.125.61/api/admin/${adminId}`,{
+            headers: {
+              'Authorization': `Bearer ${token}` // 添加 token 到请求头
+            }
+          })
           .then(response => {
             if (response.data && response.data.success) {
               this.showSuccess(response.data.msg || '删除成功');

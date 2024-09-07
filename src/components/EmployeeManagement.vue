@@ -165,7 +165,12 @@ export default {
 
     const fetchEmployees = async () => {
       try {
-        const response = await axios.get('/api/employee/getInfo');
+        const token = localStorage.getItem("token"); // 获取存储的 token
+        const response = await axios.get('/api/employee/getInfo', {
+          headers: {
+            'Authorization': `Bearer ${token}` // 添加 token 到请求头
+          }
+        });
         if (Array.isArray(response.data) && response.data.length > 0 && response.data[0].response && Array.isArray(response.data[0].response)) {
           employees.value = response.data[0].response.map(emp => ({
             ...emp,
@@ -241,7 +246,12 @@ export default {
         return;
       }
       try {
-        const response = await axios.post('/api/employee/add', { ...employeeForm, paid: 0 });
+        const token = localStorage.getItem("token"); // 获取存储的 token
+        const response = await axios.post('/api/employee/add', { ...employeeForm, paid: 0 }, {
+          headers: {
+            'Authorization': `Bearer ${token}` // 添加 token 到请求头
+          }
+        });
 
         if (response.status === 200) {
           employees.value.push(response.data);
@@ -271,7 +281,13 @@ export default {
       }
 
       try {
-        await axios.put(`/api/employee/${employeeForm.employeeId}`, { ...employeeForm });
+        const token = localStorage.getItem("token"); // 获取存储的 token
+        // 发送 PUT 请求更新员工信息
+        await axios.put(`/api/employee/${employeeForm.employeeId}`, { ...employeeForm }, {
+          headers: {
+            'Authorization': `Bearer ${token}` // 添加 token 到请求头
+          }
+        });
         const index = employees.value.findIndex(employee => employee.employeeId === employeeForm.employeeId);
         employees.value.splice(index, 1, { ...employeeForm });
         closeModal();

@@ -1,5 +1,8 @@
 <template>
   <div class="VerifyVol">
+    <transition name="fade">
+      <div v-if="showMessage" class="message-popup">{{ showMessage }}</div>
+    </transition>
     <h1>志愿者审核申请</h1>
     <table class="table">
       <thead>
@@ -63,7 +66,7 @@ export default {
       showApproveDialog: false,
       approvalReason: '',
       pageInput: '', // 页码输入
-
+      showMessage: "",
     };
   },
   created() {
@@ -79,7 +82,7 @@ export default {
         this.currentPage = pageNum; // 设置当前页码
         this.pageInput = ''; // 清空输入框
       } else {
-        alert('请输入有效的页码'); // 添加简单的页码验证
+        // alert('请输入有效的页码'); // 添加简单的页码验证
       }
     },
     async fetchApplications() {
@@ -127,12 +130,22 @@ export default {
       this.showApproveDialog = false;
       this.approvalReason = '';
     },
+    show(message) {
+      this.showMessage = message;
+      setTimeout(() => {
+        this.showMessage = "";
+      }, 1000); // 错误信息3秒后消失
+    },
     approveApplication(status) {
       console.log(`审核操作: 申请ID: ${this.selectedApplication.applicationId} 状态: ${status} 理由: ${this.approvalReason}`);
       // 调用 reviewApplication 函数进行审核
       this.reviewApplication(this.selectedApplication.applicationId, status, this.approvalReason);
     },
     async reviewApplication(applicationId, status, reason) {
+      if(reason==''){
+        this.show("必须输入理由");
+        return;
+      }
       try {
         console.log(`正在审核申请ID为 ${applicationId} 的数据...`);
         const token = localStorage.getItem("token"); // 获取存储的 token
@@ -145,12 +158,12 @@ export default {
           'Authorization':`Bearer ${token}`,
         }});
         console.log('审核请求成功:', response.data);
-        alert(`审核成功: 申请ID: ${applicationId} 状态: ${status}`);
+        this.show(`审核成功: 申请ID: ${applicationId} 状态: ${status}`);
         this.closeApproveDialog();
         this.fetchApplications(); // 刷新申请列表
       } catch (error) {
         console.error('审核请求时出错:', error);
-        alert('审核失败，请重试。');
+        this.show('审核失败，请重试。');
       }
     }
   }
@@ -293,5 +306,18 @@ textarea {
 }
 select,input {
   border: 2px solid black;
+}
+.message-popup {
+  position: fixed;
+  bottom: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.6);
+  color: rgb(255, 255, 255);
+  padding: 10px 20px;
+  border-radius: 5px;
+  z-index: 999;
+  opacity: 1;
+  transition: opacity 0.5s ease-in-out;
 }
 </style>

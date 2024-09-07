@@ -1,5 +1,8 @@
 <template>
   <div class="warehouse-management">
+    <transition name="fade">
+      <div v-if="showMessage" class="message-popup">{{ showMessage }}</div>
+    </transition>
     <h2>仓库管理</h2>
     <div class="search-bar">
       <input type="text" placeholder="食材名" v-model="searchName" />
@@ -139,6 +142,7 @@ export default {
       showEditItem: false,
       selectedItem: {},
       newItem: { name: '', quantity: '', grade: '1', expiry: '2024-09-11' },
+      showMessage: "",
     };
   },
   computed: {
@@ -235,7 +239,7 @@ export default {
 
         if (response.status === 200 && response.data.success) {
           console.log('进货成功，当前食材列表将刷新');
-
+          this.show("进货成功");
           // 进货成功后重新调用 fetchWarehouseData 方法以刷新界面
           await this.fetchWarehouseData();
 
@@ -246,9 +250,22 @@ export default {
         }
       } catch (error) {
         console.error('请求失败', error.response ? error.response.data : error.message);
+        if (error.response) {
+              if(error.response.data.message){
+                this.show(error.response.data.message);
+              }
+              else if(error.response.data.msg){
+                this.show(error.response.data.msg);
+              }
+            }
       }
     },
-
+    show(message) {
+      this.showMessage = message;
+      setTimeout(() => {
+        this.showMessage = "";
+      }, 1000); // 错误信息3秒后消失
+    },
 
 
 
@@ -631,6 +648,19 @@ export default {
 .reset-password-container input {
   flex: 1;
   margin-right: 10px;
+}
+.message-popup {
+  position: fixed;
+  bottom: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.6);
+  color: rgb(255, 255, 255);
+  padding: 10px 20px;
+  border-radius: 5px;
+  z-index: 999;
+  opacity: 1;
+  transition: opacity 0.5s ease-in-out;
 }
 select,input {
   border: 2px solid black;
