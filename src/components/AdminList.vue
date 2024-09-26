@@ -1,7 +1,9 @@
 <template>
+  <transition name="fade">
+      <div v-if="showMessage" class="message-popup">{{ showMessage }}</div>
+    </transition>
   <div class="admin-list">
     <h2>管理员列表</h2>
-
     <div class="search-bar">
       <input type="text" placeholder="昵称" v-model="searchName" />
       <select v-model="searchPosition">
@@ -64,11 +66,6 @@
       <button @click="changePage(pageInput)" :disabled="!pageInput || pageInput < 1 || pageInput > totalPages" class="button orange">跳转</button>
     </div>
 
-    <!-- 提示信息弹出框 -->
-    <transition name="fade">
-      <div v-if="showMessage" class="message-popup">{{ showMessage }}</div>
-    </transition>
-
     <!-- 详细信息弹出框 -->
     <div v-if="showDetail" class="modal">
       <div class="modal-content">
@@ -87,9 +84,6 @@
       <div class="modal-content form-container">
         <span class="close" @click="closeAddAdmin">&times;</span>
         <h3>添加管理员</h3>
-        <transition name="fade">
-          <div v-if="showMessage" class="message-popup">{{ showMessage }}</div>
-        </transition>
         <form @submit.prevent="confirmAddAdmin">
           <div class="form-group">
             <label for="newName">姓名</label>
@@ -144,9 +138,6 @@
       <div class="modal-content form-container">
         <span class="close" @click="closeEditAdmin">&times;</span>
         <h3>修改管理员信息</h3>
-        <transition name="fade">
-          <div v-if="showMessage" class="message-popup">{{ showMessage }}</div>
-        </transition>
         <form @submit.prevent="confirmEditAdmin">
           <div class="form-group">
             <label for="editPhone">手机号</label>
@@ -484,11 +475,19 @@ export default {
               this.showError('删除管理员失败: ' + response.data.msg);
             }
           })
-          .catch(() => { // 去掉未使用的 error 参数
-            this.showError('删除管理员时出错，请稍后重试');
+          .catch((error) => { 
+            if (error.response) {
+              if(error.response.data.msg){
+                this.showError(error.response.data.msg);
+              }
+            }else{
+              this.showError('删除管理员时出错，请稍后重试');              
+            }
+
           });
     },
     showError(message) {
+      console.log('Error Message:', message); // Debugging line
       this.showMessage = message;
       setTimeout(() => {
         this.showMessage = "";
@@ -696,8 +695,8 @@ export default {
 }
 
 .message-popup {
-  position: absolute;
-  top: -40px; /* 相对于模态框标题的上方 */
+  position: fixed;
+  top: 60px; 
   left: 50%;
   transform: translateX(-50%);
   background-color: rgba(0, 0, 0, 0.6);

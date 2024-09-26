@@ -84,7 +84,7 @@ export default {
       const currentDate = new Date();
       const currentWeekStart = this.getWeekStartDate(currentDate);
       const selectedWeekStart = this.getWeekStartDate(selectedDate);
-      return currentWeekStart.getTime() === selectedWeekStart.getTime();
+      return currentWeekStart.getTime() <= selectedWeekStart.getTime();
     },
     status() {
       return this.isCurrentWeek ? "可编辑" : "可查看";

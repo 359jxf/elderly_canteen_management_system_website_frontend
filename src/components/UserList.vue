@@ -131,14 +131,6 @@
               <option value="female">女</option>
             </select>
           </div>
-          <div class="form-group">
-            <label for="editIdentity">身份</label>
-            <select id="editIdentity" v-model="selectedUser.identity">
-              <option value="user">普通用户</option>
-              <option value="volunteer">志愿者</option>
-              <option value="senior">老人</option>
-            </select>
-          </div>
           <button type="submit" class="btn green">确认</button>
         </form>
       </div>
@@ -324,7 +316,7 @@ export default {
       const updatedUser = {
         ...this.selectedUser,
         gender: this.selectedUser.gender === '男' ? 'male' : 'female',
-        identity: this.selectedUser.identity === '普通用户' ? 'user' : this.selectedUser.identity === '志愿者' ? 'volunteer' : 'senior'
+        identity: ''
       };
       const token = localStorage.getItem("token"); // 获取存储的 token
       axios.put(`http://8.136.125.61/api/users/${this.selectedUser.accountId}`, updatedUser,{
