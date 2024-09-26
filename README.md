@@ -6,7 +6,7 @@
 
 “济人之老，食在幸福”长者食堂管理系统
 
-![intro](src\assets\intro.png)
+![intro](src/assets/intro.png)
 
 ## 仓库组成
 
